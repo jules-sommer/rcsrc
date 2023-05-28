@@ -112,13 +112,13 @@ const CartModal = () => {
 												Your Shopping Cart
 											</Dialog.Title>
 										</div>
-										<div className="relative mt-6 grid w-full px-4 sm:px-6">
+										<div className="relative mt-6 grid grid-cols-4 grid-rows-4 w-full px-4 sm:px-6">
 
 											{state.isEmpty ? (
 
 											// CART IS EMPTY, SHOW AN EMPTY CART DIALOGUE
 
-												<div className="flex flex-col h-full w-full items-center justify-center">
+												<div className="flex flex-col h-full w-full col-span-4 row-span-4 items-center justify-center">
 
 													<Image
 														className="opacity-80"
