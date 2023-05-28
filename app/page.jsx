@@ -1,9 +1,40 @@
 import FeaturedCard from "./featureCard/featureCard"
 
+const Hero = ({ title, blurb }) => {
+
+    return (
+
+        <section className="bg-gradient-to-tl py-24 from-slate-950 via-indigo-950 to-cyan-950">
+
+            <div className="font-sans w-9/12 mx-auto flex">
+
+                <div className="w-[50%] subpixel-antialiased">
+
+                <span className='text-2xl leading-6 mb-16 block text-sky-100'>{title}</span>
+                <span className="text-sm leading-8 text-sky-100/60">{blurb}</span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    );
+
+}
+
 export default function Home() {
 
-	return (
-			<section className='featuredItems bg-slate-950 h-auto pt-16 pb-16'>
+    return (
+            
+        <>
+
+            <Hero 
+                title={(<><h1 className="text-4xl mb-6 font-mono tracking-tight">Making the novel accessible;</h1><h3 className="text-2xl font-sans font-extralight text-sky-100/80 tracking-wide">advancing research in organic synthesis, molecular & biological discovery.</h3></>)}
+                blurb={(<p>RCSrc Canada is a Canadian research chemical supplier with owners and staff who are passionate about novel APIs, the synthesis thereof, and uncovering fascinating structure-activity relationships to benefit the field of organic chemistry, pharmacology, and synthesis. We are dedicated to bringing Canadian researchers a range of novel compounds covering research areas and receptor-binding profiles often overlooked - allowing researchers a chance to continue to advance their discovery.</p>)}
+                />
+
+			<section className='featuredItems bg-slate-950 h-auto pt-24 pb-16'>
 
 				<div className='title w-9/12 mx-auto mb-16'>
 					<h1 className='text-sky-100 text-4xl font-mono'>Featured Compounds</h1>
@@ -41,7 +72,11 @@ export default function Home() {
                             description='Dextromethorphan Hydrobromide is the hydrobromide salt form of dextromethorphan, a synthetic, methylated dextrorotary analogue of levorphanol, a substance related to codeine and a non-opioid derivate of morphine. Dextromethorphan exhibits antitussive activity and is devoid of analgesic or addictive property. This agent crosses the blood-brain-barrier and activates sigma opioid receptors on the cough center in the central nervous system, thereby suppressing the cough reflex. Potential research uses include studying the involvement of glutamate receptors in neurotoxicity.'
                         />
 				</div>
+
 			</section>
+
+        </>
+
     )
 
 }

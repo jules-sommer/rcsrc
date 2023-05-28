@@ -116,7 +116,7 @@ const CartContextProvider = ({ children }) => {
 
         var hasLocalStore = false;
 
-        if( localCartItems.length !== 0 ) {
+        if( localCartItems.length !== 0 && localCartItems !== state.items ) {
 
             dispatch({ type: 'REPLACE_CART_ITEMS', newItems: localCartItems });
             hasLocalStore = true; // trip flag
@@ -127,9 +127,7 @@ const CartContextProvider = ({ children }) => {
 
         }
 
-
-
-            console.log(`localCartItem: ${JSON.stringify(localCartItems, undefined, 4)} ( from CartProvider.jsx )`);
+        console.log(`localCartItem: ${JSON.stringify(localCartItems, undefined, 4)} ( from CartProvider.jsx )`);
 
 
     }, [state]);
