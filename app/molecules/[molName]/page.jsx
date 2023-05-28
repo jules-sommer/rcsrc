@@ -1,88 +1,129 @@
-"use client"
+/* eslint-disable react/react-in-jsx-scope */
 
-import { PRODUCT_LIST } from '../molecules.productList'
-import OrderingOptions from './orderingOptions';
+'use client';
+
+import { useEffect } from 'react';
 import Image from 'next/image';
+import { PRODUCT_LIST } from '../molecules.productList';
+import OrderingOptions from './orderingOptions';
 
 const MoleculePage = ({ params }) => {
 
-    var thisProduct = PRODUCT_LIST.filter( (thisProductInArr) => {
-        var thisNormalized = thisProductInArr.molName.trim().replace(/\W+/g, '-').toLowerCase(),
-            paramNormalized = params.molName.trim().replace(/\W+/g, '-').toLowerCase();
+	MoleculePage.propTypes = {
 
-        return thisNormalized == paramNormalized;
-    })[0];
+		params: {
+			id: String.isRequired,
+		}.isRequired,
 
-    if( thisProduct !== undefined ) {
+	};
 
-        return (
+	const thisProduct = PRODUCT_LIST.filter((thisProductInArr) => {
 
-            <section className="bg-slate-950 h-auto pt-16">
-            
-                <div className='flex w-[100%] px-12 mx-auto'>
+		const thisNormalized = thisProductInArr.molName.trim().replace(/\W+/g, '-').toLowerCase();
+		const paramNormalized = params.molName.trim().replace(/\W+/g, '-').toLowerCase();
 
-                    <div className='w-64 h-64 flex-shrink-0 rounded-2xl inline-flex mr-24 items-center bg-indigo-100 ring-1 ring-inset ring-indigo-600-700/30'>
-                        <Image 
-                            className='!h-auto !w-auto !relative '
-                            src={thisProduct.molImg}
-                            alt={thisProduct.molName}
-                            fill={true}
-                        />
-                    </div>
+		return thisNormalized == paramNormalized;
 
-                    <div className='text-sky-100 flex flex-col font-mono title w-9/12 mx-auto mb-8'>
+	})[0];
 
-                        <h1 className='text-4xl'>{thisProduct.molName}</h1>
+	// CART ITEM Obj that gets sent down to order configurator
+	const cartItem = {
+		id: thisProduct.id,
+		molName: thisProduct.molName,
+		molImg: thisProduct.molImg,
+		CAS: thisProduct.CAS,
+		...thisProduct.orderingOptions,
+		totalCost: null,
+	};
 
-                        <span className='my-5'>
+	useEffect(() => {
 
-                            <h2 className='text-md text-sky-100/50'><b className='text-sky-100/75'>CAS#</b> {thisProduct.CAS}</h2>
-                            <h2 className='text-md text-sky-100/50'><b className='text-sky-100/75'>IUPAC:</b> {thisProduct.iupac}</h2>
+		console.log(`CART ITEM: ${JSON.stringify(cartItem, undefined, 4)}`);
 
-                        </span>
+	});
 
-                        <div className='flex flex-row my-5'>
+	if (thisProduct !== undefined) {
 
-                            {thisProduct.tags.map( (thisTag) =>  (
-                                <span class="inline-flex mr-2 items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-blue-700/30">{thisTag}</span>
-                            ))}
+		return (
 
-                        </div>
+			<section className="bg-slate-950 h-auto pt-16">
 
-                        <div>
+				<div className="flex w-[100%] px-12 mx-auto">
 
-                            <p className='font-sans leading-loose my-5 text-lg font-light'>{thisProduct.description}</p>
+					<div className="w-64 h-64 flex-shrink-0 rounded-2xl inline-flex mr-24 items-center bg-indigo-100 ring-1 ring-inset ring-indigo-600-700/30">
+						<Image
+							className="!h-auto !w-auto !relative "
+							src={thisProduct.molImg}
+							alt={thisProduct.molName}
+							fill
+						/>
+					</div>
 
-                        </div>
+					<div className="text-sky-100 flex flex-col font-mono title w-9/12 mx-auto mb-8">
 
-                    </div>
+						<h1 className="text-4xl">{thisProduct.molName}</h1>
 
-                </div>
+						<span className="my-5">
 
-                <div className='py-16 text-sky-100 flex flex-col font-mono mx-16'>
+							<h2 className="text-md text-sky-100/50">
+								<b className="text-sky-100/75">CAS#</b>
+								{' '}
+								{thisProduct.CAS}
+							</h2>
+							<h2 className="text-md text-sky-100/50">
+								<b className="text-sky-100/75">IUPAC:</b>
+								{' '}
+								{thisProduct.iupac}
+							</h2>
 
-                    <div className='text-2xl mb-6'>Ordering</div>
+						</span>
 
-                    <OrderingOptions molName={thisProduct.molName} initialOptions={thisProduct.orderingOptions}/>
+						<div className="flex flex-row my-5">
 
-                </div>
+							{thisProduct.tags.map((thisTag) => (
+								<span className="inline-flex mr-2 items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-blue-700/30">{thisTag}</span>
+							))}
 
-            </section>
+						</div>
 
-        )
+						<div>
 
-    }
+							<p className="font-sans leading-loose my-5 text-lg font-light">{thisProduct.description}</p>
 
-    return (
+						</div>
 
-        <>
+					</div>
 
-            <h1>Couldn't find a product with the id: {params.id}</h1>
-        
-        </>
+				</div>
 
-    )
+				<div className="py-16 text-sky-100 flex flex-col font-mono mx-16">
 
-}
+					<div className="text-2xl mb-6">Ordering</div>
+
+					<OrderingOptions
+						id={thisProduct.id}
+						molName={thisProduct.molName}
+						initialOptions={cartItem}
+					/>
+
+				</div>
+
+			</section>
+
+		);
+
+	}
+
+	return (
+
+		<h1>
+			Couldn&apos;t find a product with the id:
+			{' '}
+			{params.id}
+		</h1>
+
+	);
+
+};
 
 export default MoleculePage;

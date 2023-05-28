@@ -41,7 +41,7 @@ export const OPTIONS = {
                     name: "Autosampler Vial",
                     septa: "PTFE and Silicone Septa",
                     top: "HDPE Screw Top",
-                    shorthand: "Autosampler",
+                    shortHand: "Autosampler",
                     maxVol: 2,
                     costAdd: 3.50,
                 },
@@ -50,7 +50,7 @@ export const OPTIONS = {
                     name: "Boro 3.3 Serum Vial",
                     septa: "Butyl Rubber Septa",
                     top: ["Flip Top", "Tear Off"],
-                    shorthand: "Serum Vial",
+                    shortHand: "Serum Vial",
                     maxVol: 100,
                     costAdd: 5.00,
                 },
@@ -58,7 +58,7 @@ export const OPTIONS = {
                     id: 2,
                     name: "Amber Reagent Bottle",
                     top: "PP Screw Top",
-                    shorthand: "Media Bottle",
+                    shortHand: "Media Bottle",
                     maxVol: 100,
                     costAdd: 1.00,
                 }
@@ -100,6 +100,7 @@ export const PRODUCT_LIST = [
 
     {
 
+        id: 0,
         molName: 'Etizolam',
         CAS: '40054-69-1',
         iupac: '4-(2-Chlorophenyl)-2-ethyl-9-methyl-6H-thieno[3,2-f][1,2,4]triazolo[4,3-a][1,4]diazepine',
@@ -121,7 +122,7 @@ export const PRODUCT_LIST = [
             containers: OPTIONS.SOLUTION.containers,
             concentrations: {
                 unit: OPTIONS.SOLUTION.concentration.units[0] /* mg/mL */,
-                values: OPTIONS.SOLUTION.concentration.values.slice(0,3) /* 1,2,5,10 mg/mL*/,
+                values: OPTIONS.SOLUTION.concentration.values.slice(0,4) /* 1,2,5,10 mg/mL*/,
                 selected: 2,
             },
             quantities: {
@@ -145,14 +146,20 @@ export const PRODUCT_LIST = [
                     cost += 0.50
     
                 if(options.containers.selected !== false) {
-                    var container = options.containers.options[options.containers.selected];
-                    cost += container.costAdd;
+
+                    console.log( options.containers.selected )
+
+                    const containerCostAdd = options.containers.selected.costAdd;
+                    cost += containerCostAdd;
+
                 }
 
                 if(options.solvents.selected !== false) {
-                    console.log(option.solvents.selected);
-                    var solvent = options.solvents.options[options.solvents.selected];
-                    cost += solvent.costAdd;
+
+                    console.log(options.solvents.selected);
+                    const solventCostAdd = options.solvents.selected.costAdd;
+                    cost += solventCostAdd
+
                 }
 
                 return (Math.round(cost * 100) / 100).toFixed(2);;

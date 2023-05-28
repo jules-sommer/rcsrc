@@ -2,10 +2,15 @@ import { TrashIcon } from "@heroicons/react/24/outline"
 import { PRODUCT_LIST } from "./molecules.productList"
 import Image from "next/image"
 import Selector from "./molecules.classSelector"
+import Link from "next/link"
 
 const MolListItem = ({ molName, CAS, description, molImg, tags, scaffold }) => {
 
 	return (
+
+        <Link
+            href={`/molecules/${molName.toLowerCase().replace(' ', '-')}`}
+            >
 
 		<div className='h-52 w-[100%] flex flex-row transition-all cursor-pointer hover:origin-center hover:scale-[1.025] bg-gradient-to-t from-indigo-200 via-blue-200 to-sky-200 rounded-2xl'>
 			<div className='w-52 h-52 flex-shrink-0 rounded-2xl bg-transparent'>
@@ -38,6 +43,8 @@ const MolListItem = ({ molName, CAS, description, molImg, tags, scaffold }) => {
 				
 			</div>
 		</div>
+
+        </Link>
 
 	)
 
