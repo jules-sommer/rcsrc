@@ -1,6 +1,12 @@
-"use client"
+/* eslint-disable nonblock-statement-body-position */
+/* eslint-disable react/prop-types */
+/* eslint-disable react/react-in-jsx-scope */
 
-import { useState, useContext, createContext, useReducer, useMemo, useEffect } from 'react';
+'use client';
+
+import {
+	createContext, useReducer, useEffect,
+} from 'react';
 import { usePathname } from 'next/navigation';
 
 import createPersistedState from 'use-persisted-state';
@@ -10,139 +16,176 @@ export const CartDispatchContext = createContext(null);
 
 const CartContextProvider = ({ children }) => {
 
-    const useCartStateLocalStorage = createPersistedState('cartState');
+	const useCartStateLocalStorage = createPersistedState('cartState');
 
-    const pathname = usePathname();
+	const pathname = usePathname();
 
-    const cartReducer = (state, action) => {
+	const cartReducer = (state, action) => {
 
-        switch ( action.type ) {
+		switch (action.type) {
 
-            case 'REPLACE_CART_ITEMS': 
+		case 'REPLACE_CART_ITEMS':
 
-                return {
-                    ...state,
-                    items: action.newItems,
-                }
+			let isEmpty = true;
 
-            case 'UPDATE_CART_TOTAL':
+			if( action.newItems.length >= 0 )
+				isEmpty = false;
 
-                console.log(state.cartTotal);
-                
-                if( action.operator === 'ADD' ) { 
+			return {
+				...state,
+				items: action.newItems,
+				isEmpty: isEmpty,
+			};
 
-                    return {
-                        ...state,
-                        cartTotal: cartTotal += action.amount,
-                    }
+		case 'REPLACE_STATE':
 
-                } else if( action.operator === 'SUB' ) {
+			return { ...action.newState };
 
-                    return {
-                        ...state,
-                        cartTotal: cartTotal -= action.amount,
-                    }
+		case 'UPDATE_CART_TOTAL':
 
-                }
+			console.log(state.cartTotal);
 
-            case 'ADD_TO_CART':
+			if (action.operator === 'ADD') {
 
-                console.log(`I AM ADDING: ${action.cartItem} to CART!`)
+				return {
+					...state,
+					cartTotal: cartTotal += action.amount,
+				};
 
-                return {
-                    ...state,
-                    items: [...state.items, action.cartItem],
-                    isEmpty: false,
+			} if (action.operator === 'SUB') {
 
-                }
+				return {
+					...state,
+					cartTotal: cartTotal -= action.amount,
+				};
 
-            case 'UPDATE_CART_STATE':
+			}
+			
+			return {...state};
 
-                console.log(pathname);
+		case 'ADD_TO_CART':
 
-                if( action.isOpen == true ) {
+			console.log(`I AM ADDING: ${action.cartItem} to CART!`);
 
-                    return {
+			return {
+				...state,
+				items: [...state.items, action.cartItem],
+				isEmpty: false,
 
-                        ...state,
-                        isOpen: {
-                            state: true,
-                            returnUrl: pathname,
-                        },
+			};
 
-                    }
+		case 'EMPTY_CART':
+			
+			return {
+				...state,
+				items: [],
+				isEmpty: true,
+			}
 
-                } else if( action.isOpen == false ) {
+		case 'UPDATE_CART_STATE':
 
-                    return {
-                        
-                        ...state,
-                        isOpen: {
-                            state: false,
-                            returnUrl: null,
-                        }
+			console.log(pathname);
 
-                    }
+			if (action.isOpen == true) {
 
-                } else {
+				return {
 
-                    return { ...state };
+					...state,
+					isOpen: {
+						state: true,
+						returnUrl: pathname,
+					},
 
-                }
+				};
 
-            default:
+			} if (action.isOpen == false) {
 
-                console.log('DEFAULT');
-                return { ...state };
+				return {
 
-        } 
+					...state,
+					isOpen: {
+						state: false,
+						returnUrl: null,
+					},
 
-    }
+				};
 
-    const initialState = {
+			}
 
-        items: [],
-        cartTotal: 0,
-        paymentMethod: false,
-        isEmpty: true,
-        isOpen: { state: false, returnUrl: null },
+			return { ...state };
 
-    };
+		default:
 
-    const [state, dispatch] = useReducer(cartReducer, initialState);
-    const [localCartItems, setLocalCartItems] = useCartStateLocalStorage(initialState);
+			console.log('DEFAULT');
+			return { ...state };
 
-    useEffect(() => {
+		}
 
-        var hasLocalStore = false;
+	};
 
-        if( localCartItems.length !== 0 && localCartItems !== state.items ) {
+	const initialState = {
 
-            dispatch({ type: 'REPLACE_CART_ITEMS', newItems: localCartItems });
-            hasLocalStore = true; // trip flag
+		items: [],
+		cartTotal: 0,
+		paymentMethod: false,
+		isEmpty: true,
+		isOpen: { state: false, returnUrl: null },
 
-        } else if( localCartItems.length == 0 && state.items.length > 0 ) {
+	};
 
-            setLocalCartItems(state.items);
+	const [state, dispatch] = useReducer(cartReducer, initialState);
+	const [localCartItems, setLocalCartItems] = useCartStateLocalStorage(initialState);
 
-        }
+	useEffect(() => {
 
-        console.log(`localCartItem: ${JSON.stringify(localCartItems, undefined, 4)} ( from CartProvider.jsx )`);
+		let hasExistingState = true;
+		let hasLocalStoreState = true;
 
+		if( state.items.length === 0 )
+			hasExistingState = false;
 
-    }, [state]);
+		if( !localCartItems.items )
+			hasLocalStoreState = false;
 
+		if( !hasExistingState && !hasLocalStoreState ) {
 
-    return (
+			// no local or existing state exists
 
-        <CartStateContext.Provider value={state}>
-            <CartDispatchContext.Provider value={dispatch}>
-                {children}
-            </CartDispatchContext.Provider>
-        </CartStateContext.Provider>
+		} else if( hasExistingState && !hasLocalStoreState) {
 
-    )
+			setLocalCartItems({ ...state });
 
-}
+		} else if( !hasExistingState && hasLocalStoreState ) {
+
+			dispatch({ type: 'REPLACE_STATE', newState: { ...localCartItems } });
+
+		} else {
+
+			// There is local store and existing state
+
+			if( JSON.stringify(localCartItems, undefined, 2) === JSON.stringify(state, undefined, 2) )
+				console.log(`state and localStoreState are equal....`);
+			else
+				console.log(`state and localStoreState are *NOT* equal....`);
+
+		}
+
+		console.log(`hasExistingState: ${hasExistingState}`);
+		console.log(`hasLocalStoreState: ${hasLocalStoreState}`);
+		console.log(`localStoreCart: ${JSON.stringify(localCartItems, undefined, 4)}`)
+
+	}, [state.items]);
+
+	return (
+
+		<CartStateContext.Provider value={state}>
+			<CartDispatchContext.Provider value={dispatch}>
+				{children}
+			</CartDispatchContext.Provider>
+		</CartStateContext.Provider>
+
+	);
+
+};
 
 export default CartContextProvider;

@@ -6,12 +6,15 @@
 import {
 	Fragment, useContext,
 } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, Disclosure, Transition } from '@headlessui/react';
 import { useRouter, usePathname } from 'next/navigation';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { CartStateContext, CartDispatchContext } from '../../cartProvider';
-import CartListItem from './cartListItem';
+import CartListItem from '../../CartListItem';
+
+
+
 
 const CartModal = () => {
 
@@ -20,8 +23,6 @@ const CartModal = () => {
 
 	const state = useContext(CartStateContext);
 	const cartDispatch = useContext(CartDispatchContext);
-
-	console.log(`CART STATE FROM THE EYES OF CART PAGE: ${JSON.stringify(state, undefined, 3)}`);
 
 	const setOpenState = (isOpen) => {
 
@@ -34,8 +35,6 @@ const CartModal = () => {
 
 	// eslint-disable-next-line react/destructuring-assignment
 	const cartItems = state.items;
-
-	console.log(cartItems);
 
 	return (
 		<Transition.Root
@@ -112,7 +111,7 @@ const CartModal = () => {
 												Your Shopping Cart
 											</Dialog.Title>
 										</div>
-										<div className="relative mt-6 grid grid-cols-4 grid-rows-4 w-full px-4 sm:px-6">
+										<div className="relative mt-6 grid grid-cols-5 grid-rows-4 w-full px-4 sm:px-6">
 
 											{state.isEmpty ? (
 
@@ -135,15 +134,17 @@ const CartModal = () => {
 
 												</div>
 
-											) : cartItems.forEach((thisItem) => {
+											) : (cartItems.map((thisItem, index) => (
 
-												console.log(`FROM CART PAGE: var thisItem: ${JSON.stringify(thisItem, undefined, 4)}`);
+												<div className={`grid-flow-row col-span-8 row-span-${cartItems.length * 4}`}>
+													<CartListItem index={index} cartItemObj={thisItem} />
+												</div>
 
-												return (<CartListItem item={thisItem} />);
+											)))}
 
-											})}
 										</div>
-									</div>
+
+									</div> 
 								</Dialog.Panel>
 							</Transition.Child>
 						</div>

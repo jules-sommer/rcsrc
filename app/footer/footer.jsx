@@ -1,9 +1,7 @@
 import Logo from '../logo'
 import NavLink from '../navLink'
 
-const Footer = () => {
-
-    return (
+const Footer = () => (
         
         <footer className='flex flex-col h-72 bg-gradient-to-b from-slate-950 to-indigo-950 items-center justify-center'>
             <Logo scale={2} className='justify-center !mr-0'/>
@@ -16,7 +14,5 @@ const Footer = () => {
         </footer>
 
     )
-
-}
 
 export default Footer

@@ -1,7 +1,8 @@
-import Image from "next/image";
+/* eslint-disable react/prop-types */
+/* eslint-disable react/react-in-jsx-scope */
 
-const Logo = ({scale = 1}) => {
-    return <Image className='mr-5' src="/logo.png" alt="RCSRC Canada" height={30*scale} width={60*scale}/>;
-}
+import Image from 'next/image';
 
-export default Logo
+const Logo = ({ scale = 1 }) => <Image className="mr-5" src="/logo.png" alt="RCSRC Canada" height={30 * scale} width={60 * scale} />;
+
+export default Logo;
