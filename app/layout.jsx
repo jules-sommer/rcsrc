@@ -6,9 +6,8 @@ import 'material-icons/iconfont/material-icons.css';
 import 'material-symbols';
 
 import CartContextProvider from './cartProvider';
-
 import LogRocket from 'logrocket';
-LogRocket.init('llbux5/rcsrc-canada');
+LogRocket.init('llbux5/rcsrc-canada-web');
 
 export const metadata = {
   title: 'RCSrc Canada',
