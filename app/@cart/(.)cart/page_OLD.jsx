@@ -7,12 +7,14 @@ import {
 	Fragment, useContext,
 } from 'react';
 import { Dialog, Disclosure, Transition } from '@headlessui/react';
-import { useRouter, usePathname, getServerSidedParams } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { CartStateContext, CartDispatchContext } from '../../cartProvider';
 import CartListItem from '../../CartListItem';
-import Formatter from '../../moneyFormatter';
+
+
+
 
 const CartModal = () => {
 
@@ -24,12 +26,15 @@ const CartModal = () => {
 
 	const setOpenState = (isOpen) => {
 
-		cartDispatch({ type: 'TOGGLE_OPEN', isOpen, pathname });
+		console.log(`CURRENT PATHNAME: ${pathname}, RETURN URL: ${state.isOpen.returnUrl}`);
 		router.push(state.isOpen.returnUrl);
+
+		cartDispatch({ type: 'UPDATE_CART_IS_OPEN', isOpen });
 
 	};
 
 	// eslint-disable-next-line react/destructuring-assignment
+	const cartItems = state.items;
 
 	return (
 		<Transition.Root
@@ -37,14 +42,18 @@ const CartModal = () => {
 			appear
 			as={Fragment}
 			afterLeave={() => {
+
 				setOpenState(false);
+
 			}}
 		>
 			<Dialog
 				as="div"
 				className="relative z-50"
 				onClose={() => {
+
 					setOpenState(false);
+
 				}}
 			>
 				<Transition.Child
@@ -86,7 +95,9 @@ const CartModal = () => {
 												type="button"
 												className="rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
 												onClick={() => {
+
 													setOpenState(false);
+
 												}}
 											>
 												<span className="sr-only">Close panel</span>
@@ -100,13 +111,13 @@ const CartModal = () => {
 												Your Shopping Cart
 											</Dialog.Title>
 										</div>
-										<div className="relative mt-6 grid grid-cols-5 grid-rows-4 w-full px-4 sm:px-6 gap-4">
+										<div className="relative mt-6 grid grid-cols-5 grid-rows-4 w-full px-4 sm:px-6">
 
-											{state.items.length === 0 ? (
+											{state.isEmpty ? (
 
 											// CART IS EMPTY, SHOW AN EMPTY CART DIALOGUE
 
-												<div className="flex flex-col h-full w-full col-span-auto row-span-auto items-center justify-center">
+												<div className="flex flex-col h-full w-full col-span-4 row-span-4 items-center justify-center">
 
 													<Image
 														className="opacity-80"
@@ -123,14 +134,17 @@ const CartModal = () => {
 
 												</div>
 
-											) : (
-												state.items.map((cartItem) => (
-													<CartListItem cartItemObj={cartItem} />
-												)))}
+											) : (cartItems.map((thisItem, index) => (
+
+												<div className={`grid-flow-row col-span-8 row-span-${cartItems.length * 4}`}>
+													<CartListItem index={index} cartItemObj={thisItem} />
+												</div>
+
+											)))}
 
 										</div>
 
-									</div>
+									</div> 
 								</Dialog.Panel>
 							</Transition.Child>
 						</div>

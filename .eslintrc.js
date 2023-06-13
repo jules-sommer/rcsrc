@@ -1,5 +1,6 @@
 module.exports = {
 	root: true,
+	depedencies: ['eslint-config-airbnb'],
 	rules: {
 		'linebreak-style': [0, 'windows'],
 		indent: [2, 'tab'],
@@ -8,6 +9,8 @@ module.exports = {
 		'react/jsx-indent-props': [1, 'tab'],
 		'padded-blocks': [2, 'always', { allowSingleLineBlocks: true }],
 		'react/function-component-definition': [1, { namedComponents: 'arrow-function' }],
+		'curly': ['error', 'multi-or-nest'],
+		'react/prop-types': [1, { ignore: ['children', 'className'] }],
 	},
 	settings: {
 		react: {

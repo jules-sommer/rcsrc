@@ -6,27 +6,35 @@
 import { useContext } from 'react';
 import { CartStateContext, CartDispatchContext } from '../cartProvider';
 import CartListItem from '../CartListItem';
-import Image from 'next/image';
+import Formatter from '../moneyFormatter';
 
 const Cart = () => {
 
 	const state = useContext(CartStateContext);
 	const cartDispatch = useContext(CartDispatchContext);
 
-	// eslint-disable-next-line react/destructuring-assignment
-	let cartItems = state.items;
-
-	console.error(cartItems);
+	const cartItems = state.items; 
 
 	return (
 
-		<div className="max-w-4xl mx-auto">
+		<>
+
+		<div className="w-full mx-auto grid grid-flow-col grid-cols-6">
 
 			<h1 className="font-mono text-2xl text-sky-200">Your Cart</h1>
 
 			{cartItems.map((thisItem, index) => <CartListItem cartItemObj={thisItem} />)}
 
+			<p className='font-mono text-xl text-sky-300'>
+				Total Cost:
+				{Formatter.format(parseFloat(state.cartTotal))}
+			</p>
+
 		</div>
+
+			<pre className='text-sky-200 mx-full p-12 whitespace-pre-wrap'>{JSON.stringify(state, null, 2)}</pre>
+
+		</>
 
 	)
 

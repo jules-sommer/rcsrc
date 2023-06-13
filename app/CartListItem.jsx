@@ -5,6 +5,8 @@
 
 import Image from 'next/image';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { useContext } from 'react';
+import { CartDispatchContext } from './cartProvider';
 
 const QuantityDisplay = ({ type, value, unit }) => {
 
@@ -18,7 +20,21 @@ const QuantityDisplay = ({ type, value, unit }) => {
 
 				<span>
 
-					<span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{value.qty} {unit.qty} @ {value.concentration} {unit.concentration} [{volume}mL]</span>
+					<span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+						{value.qty}
+						{' '}
+						{unit.qty}
+						{' '}
+						@
+						{' '}
+						{value.concentration}
+						{' '}
+						{unit.concentration}
+						{' '}
+						[
+						{volume}
+						mL]
+					</span>
 
 				</span>
 
@@ -30,7 +46,7 @@ const QuantityDisplay = ({ type, value, unit }) => {
 
 	return (
 
-		<div className='row-span-4'>
+		<div className="row-span-4">
 
 			<span className="px-3 py-5">{value}</span>
 			<span className="px-3 py-5">{unit}</span>
@@ -43,18 +59,26 @@ const QuantityDisplay = ({ type, value, unit }) => {
 
 const CartListItem = ({ cartItemObj }) => {
 
-	console.log(`thisCartItem: ${cartItemObj} ( from cartListItem.jsx )`);
+	const cartDispatch = useContext(CartDispatchContext);
+
+	const handleRemoveThisCartItem = (event) => {
+
+		console.log(`handleRemoveThisCartItem(): ${JSON.stringify(cartItemObj, undefined, 4)} ( from cartListItem.jsx )`);
+
+		cartDispatch({ type: 'REMOVE_CART_ITEM', cartItem: cartItemObj });
+		
+	};
 
 	const isSolution = cartItemObj.format.selected === 'Solution';
 
 	return (
 
-		<div className="!min-h-[75px] grid flex-grow-0 border-2 border-violet-400 rounded-2xl bg-slate-200 ">
+		<div className="!min-h-[75px] w-full grid col-span-auto flex-grow rounded-2xl backdrop-blur-lg bg-zinc-300/30">
 
-			<div className="col-span-1 row-span-4 row-start-1 w-[75px] h-[75px] relative rounded-full overflow-hidden bg-slate-100">
+			<div className="col-span-1 row-span-4 row-start-1 w-[75px] h-[75px] relative rounded-2xl overflow-hidden bg-slate-100">
 
 				<Image
-					className="rounded-full bg-slate-300 stroke-slate-700 stroke-2 relative top-0 bottom-0 left-0 right-0"
+					className="rounded-tl-2xl relative top-0 bottom-0 left-0 right-0"
 					src={cartItemObj.molImg}
 					fill
 				/>
@@ -63,7 +87,11 @@ const CartListItem = ({ cartItemObj }) => {
 
 			<div className="col-span-2 row-span-1 row-start-0 row-end-2 flex flex-col items-start flex-grow-0 justify-center">
 
-				<h1 className="font-mono font-bold">{cartItemObj.molName} {cartItemObj.format.selected}</h1>
+				<h1 className="font-mono font-bold">
+					{cartItemObj.molName}
+					{' '}
+					{cartItemObj.format.selected}
+				</h1>
 				<p className="font-mono">
 					CAS#
 					{' '}
@@ -81,17 +109,15 @@ const CartListItem = ({ cartItemObj }) => {
 						? { qty: cartItemObj.quantities.values[cartItemObj.quantities.selected], concentration: cartItemObj.concentrations.values[cartItemObj.concentrations.selected] }
 						: cartItemObj.quantities.selected}
 					unit={isSolution
-						? { concentration: cartItemObj.concentrations.unit, qty: cartItemObj.quantities.unit } 
+						? { concentration: cartItemObj.concentrations.unit, qty: cartItemObj.quantities.unit }
 						: cartItemObj.quantites.selected}
 				/>
 			</div>
 
 			<div className="col-span-1 row-span-1 row-start-3 col-start-3">
-				<DeleteForeverIcon className="hover:cursor-pointer" />
-			</div>
-
-			<div className="col-span-1 row-span-1 row-start-1 col-start-4">
-				<p>${cartItemObj.totalCost} CAD</p>
+				<button onClick={handleRemoveThisCartItem} type="submit" className='p-5 flex items-center justify-center'>
+					<DeleteForeverIcon className="hover:cursor-pointer" />
+				</button>
 			</div>
 
 		</div>

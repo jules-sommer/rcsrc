@@ -97,6 +97,12 @@ export const OPTIONS = {
 
 };
 
+const getCostFunctionById = () => {
+
+
+
+};
+
 export const PRODUCT_LIST = [
 
 	{
@@ -110,6 +116,10 @@ export const PRODUCT_LIST = [
 
 		scaffold: CHEMICAL_SCAFFOLDS[0],
 		tags: ['[1,4]-diazepine', 'GABA-A PAM via BZD-site', 'sedative', 'hypnotic', 'anxiolytic'],
+
+		// TO-DO: make it so that the options are not hard-coded, but rather are generated from the product's properties
+		// 		  this will allow for more flexibility in the future
+		//        for example, if we want to add a new format, we can just add it to the product's properties and it will be generated
 
 		orderingOptions: {
 
@@ -131,7 +141,12 @@ export const PRODUCT_LIST = [
 				values: OPTIONS.SOLUTION.quantities.values.slice(5, 9), /* 50,100,250,500 */
 				selected: 1,
 			},
+
+			// TO-DO: make this function a switch statement that takes in cartItem.id and returns the correct cost function
+
 			costFunction: (options) => {
+
+				console.warn('COST FUNCTION CALLED...');
 
 				const qty = options.quantities.selected !== false ? options.quantities.values[options.quantities.selected] : 0;
 
@@ -224,3 +239,5 @@ export const PRODUCT_LIST = [
 	},
 
 ];
+
+export { PRODUCT_LIST as default, getCostFunctionById };
