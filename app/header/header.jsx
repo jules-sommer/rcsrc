@@ -19,6 +19,7 @@ const Header = () => {
                 <nav className='flex justify-end select-none items-center'>
                     <NavLink href='/about'>About</NavLink>
                     <NavLink href='/molecules'>Molecules</NavLink>
+                    <NavLink href='/cart'>Cart</NavLink>
                 </nav>
 
                 <HeaderCartIcon />

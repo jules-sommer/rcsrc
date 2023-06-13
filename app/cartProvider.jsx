@@ -1,88 +1,130 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable nonblock-statement-body-position */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/react-in-jsx-scope */
 
 'use client';
 
+import { v4 as uuidv4 } from 'uuid';
+import { uniqueId } from 'lodash';
+
 import {
 	createContext, useReducer, useEffect,
 } from 'react';
+
+import { useIsClient } from './isClientProvider';
+
 import { usePathname } from 'next/navigation';
 
-import createPersistedState from 'use-persisted-state';
+import _ from 'lodash';
+import { ST } from 'next/dist/shared/lib/utils';
 
 export const CartStateContext = createContext(null);
 export const CartDispatchContext = createContext(null);
 
 const CartContextProvider = ({ children }) => {
 
-	const useCartStateLocalStorage = createPersistedState('cartState');
-
 	const pathname = usePathname();
+	const isClient = useIsClient();
 
 	const cartReducer = (state, action) => {
 
 		switch (action.type) {
 
-		case 'REPLACE_CART_ITEMS':
+			case 'LOCAL_STORE_EXISTS':
 
-			let isEmpty = true;
+				return { ...action.value };
 
-			if( action.newItems.length >= 0 )
-				isEmpty = false;
+			case 'REPLACE_CART_ITEMS':
 
-			return {
-				...state,
-				items: action.newItems,
-				isEmpty: isEmpty,
-			};
+				let isEmpty = true;
 
-		case 'REPLACE_STATE':
+				if (action.newItems.length >= 0)
+					isEmpty = false;
 
-			return { ...action.newState };
-
-		case 'UPDATE_CART_TOTAL':
-
-			console.log(state.cartTotal);
-
-			if (action.operator === 'ADD') {
+				const items = action.newItems;
 
 				return {
 					...state,
-					cartTotal: cartTotal += action.amount,
+					items,
+					isEmpty,
 				};
 
-			} if (action.operator === 'SUB') {
+			case 'REMOVE_CART_ITEM':
+
+				// check if cartItem has a totalCost property, if it does, we need to remove it from the total cart cost
+					
+				if (Object.hasOwn(action.cartItem, 'totalCost') === false)
+					throw new Error('CART ITEM DOES NOT HAVE A TOTAL COST PROPERTY... ( cartReducer, case: "REMOVE_CART_ITEM", cartProvider.jsx )');
+
+				// check if totalCost is a number and is greater than or equal to zero, if not throw an error
+				if (typeof action.cartItem.totalCost !== 'number' || action.cartItem.totalCost > 0)
+					throw new Error('CART ITEM TOTAL COST IS NOT A NUMBER OR IS LESS THAN OR EQUAL TO ZERO... ( cartReducer, case: "REMOVE_CART_ITEM", cartProvider.jsx )');
+
+				const costOfCartItem = action.cartItem.totalCost;
+				const cartTotal = state.cartTotal - costOfCartItem;
+				
+				console.log(`NEW CART TOTAL: ${cartTotal}...`);
 
 				return {
 					...state,
-					cartTotal: cartTotal -= action.amount,
+					items: state.items.filter((item) => item.itemID === action.cartItem.itemID), // removes the item from the cart via es6 filter array
+					cartTotal,
 				};
 
-			}
-			
-			return {...state};
+			// Takes state and replaces it with new state entirely
+			case 'REPLACE_STATE':
 
-		case 'ADD_TO_CART':
+				return { ...action.newState };
 
-			console.log(`I AM ADDING: ${action.cartItem} to CART!`);
+			// updates the total cart cost by adding or subtracting a value
+			case 'UPDATE_CART_TOTAL':
 
-			return {
-				...state,
-				items: [...state.items, action.cartItem],
-				isEmpty: false,
+				console.log(state.cartTotal);
+				// eslint-disable-next-line no-case-declarations
+				let newTotal = state.cartTotal;
 
-			};
+				console.log(`FROM CartProvide: I am updating the total cart cost by ${action.operator}ing ${action.value}...`);
 
-		case 'EMPTY_CART':
-			
-			return {
-				...state,
-				items: [],
-				isEmpty: true,
-			}
+				if (action.operator === 'ADD') newTotal += action.value;
+				if (action.operator === 'SUB') newTotal -= action.value;
+				if (action.operator === 'REPLACE') newTotal = action.value;
 
-		case 'UPDATE_CART_STATE':
+				console.log(`FROM CartProvide: New total is ${newTotal}...`);
+
+				return {
+					...state,
+					cartTotal: newTotal,
+				};
+
+			// ADDS A NEW ITEM TO THE CART
+			case 'ADD_TO_CART':
+
+				console.log(`I AM ADDING: ${action.cartItem} to CART!`);
+
+				// 
+
+				return {
+					...state,
+					items: [...state.items, {
+						...action.cartItem,
+					}],
+					isEmpty: false, // must not be empty because we are adding an item
+
+				};
+
+
+			// empties the cart
+			case 'EMPTY_CART':
+
+				return {
+					...state,
+					items: [],
+					isEmpty: true,
+				};
+
+			// updates the UI for cart open or closed
+			case 'TOGGLE_OPEN':
 
 			console.log(pathname);
 
@@ -114,14 +156,16 @@ const CartContextProvider = ({ children }) => {
 
 			return { ...state };
 
-		default:
+			default:
 
-			console.log('DEFAULT');
-			return { ...state };
+				console.log('DEFAULT');
+				return { ...state };
 
 		}
 
 	};
+
+	// initial cart state
 
 	const initialState = {
 
@@ -133,46 +177,19 @@ const CartContextProvider = ({ children }) => {
 
 	};
 
-	const [state, dispatch] = useReducer(cartReducer, initialState);
-	const [localCartItems, setLocalCartItems] = useCartStateLocalStorage(initialState);
+	const [ state, dispatch ] = useReducer(cartReducer, initialState);
 
 	useEffect(() => {
 
-		let hasExistingState = true;
-		let hasLocalStoreState = true;
+		if (JSON.parse(localStorage.getItem('cartStore')))
+			dispatch({ type: 'LOCAL_STORE_EXISTS', value: JSON.parse(localStorage.getItem('cartStore')) });
+			
+	}, []);
 
-		if( state.items.length === 0 )
-			hasExistingState = false;
+	useEffect(() => {
 
-		if( !localCartItems.items )
-			hasLocalStoreState = false;
-
-		if( !hasExistingState && !hasLocalStoreState ) {
-
-			// no local or existing state exists
-
-		} else if( hasExistingState && !hasLocalStoreState) {
-
-			setLocalCartItems({ ...state });
-
-		} else if( !hasExistingState && hasLocalStoreState ) {
-
-			dispatch({ type: 'REPLACE_STATE', newState: { ...localCartItems } });
-
-		} else {
-
-			// There is local store and existing state
-
-			if( JSON.stringify(localCartItems, undefined, 2) === JSON.stringify(state, undefined, 2) )
-				console.log(`state and localStoreState are equal....`);
-			else
-				console.log(`state and localStoreState are *NOT* equal....`);
-
-		}
-
-		console.log(`hasExistingState: ${hasExistingState}`);
-		console.log(`hasLocalStoreState: ${hasLocalStoreState}`);
-		console.log(`localStoreCart: ${JSON.stringify(localCartItems, undefined, 4)}`)
+		if (state !== initialState)
+			window.localStorage.setItem('cartStore', JSON.stringify(state));
 
 	}, [state.items]);
 
