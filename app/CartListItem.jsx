@@ -7,6 +7,7 @@ import Image from 'next/image';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { useContext } from 'react';
 import { CartDispatchContext } from './cartProvider';
+import Formatter from './moneyFormatter';
 
 const QuantityDisplay = ({ type, value, unit }) => {
 
@@ -57,9 +58,12 @@ const QuantityDisplay = ({ type, value, unit }) => {
 
 };
 
-const CartListItem = ({ cartItemObj }) => {
+const CartListItem = ({ key, cartItemObj }) => {
 
 	const cartDispatch = useContext(CartDispatchContext);
+
+	console.log(`key: ${JSON.stringify(key, undefined, 4)} ( from cartListItem.jsx )`);
+
 
 	const handleRemoveThisCartItem = (event) => {
 
@@ -88,7 +92,7 @@ const CartListItem = ({ cartItemObj }) => {
 			<div className="col-span-2 row-span-1 row-start-0 row-end-2 flex flex-col items-start flex-grow-0 justify-center">
 
 				<h1 className="font-mono font-bold">
-					{cartItemObj.molName}
+					{JSON.stringify(key)}{cartItemObj.molName}
 					{' '}
 					{cartItemObj.format.selected}
 				</h1>
@@ -114,7 +118,11 @@ const CartListItem = ({ cartItemObj }) => {
 				/>
 			</div>
 
-			<div className="col-span-1 row-span-1 row-start-3 col-start-3">
+			<div className="col-span-1 row-span-1 row-start-3 col-start-4">
+				<p>{Formatter.format(cartItemObj.totalCost)}</p>
+			</div>
+
+			<div className="col-span-1 row-span-2 row-start-1 col-start-4">
 				<button onClick={handleRemoveThisCartItem} type="submit" className='p-5 flex items-center justify-center'>
 					<DeleteForeverIcon className="hover:cursor-pointer" />
 				</button>

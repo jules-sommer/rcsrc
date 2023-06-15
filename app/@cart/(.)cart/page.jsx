@@ -100,11 +100,11 @@ const CartModal = () => {
 												Your Shopping Cart
 											</Dialog.Title>
 										</div>
-										<div className="relative mt-6 grid grid-cols-5 grid-rows-4 w-full px-4 sm:px-6 gap-4">
+										<div className="relative mt-6 grid grid-flow-col grid-cols-1 grid-rows-4 w-full px-4 sm:px-6 gap-4">
 
 											{state.items.length === 0 ? (
 
-											// CART IS EMPTY, SHOW AN EMPTY CART DIALOGUE
+												// CART IS EMPTY, SHOW AN EMPTY CART DIALOGUE
 
 												<div className="flex flex-col h-full w-full col-span-auto row-span-auto items-center justify-center">
 
@@ -123,12 +123,20 @@ const CartModal = () => {
 
 												</div>
 
-											) : (
-												state.items.map((cartItem) => (
-													<CartListItem cartItemObj={cartItem} />
-												)))}
+											) : ( 
+													
+												state.items.map((cartItem, index) => {
+													return <CartListItem key={index} cartItemObj={cartItem} />
+												}
+											
+											))}
 
 										</div>
+
+										<p className='font-mono text-xl text-sky-300'>
+											Total Cost:
+											{Formatter.format(parseFloat(state.cartTotal))}
+										</p>
 
 									</div>
 								</Dialog.Panel>
