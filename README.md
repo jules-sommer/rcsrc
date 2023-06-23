@@ -17,8 +17,8 @@ Is the code that tells Next.js to build a serverless containerized output.
 
 Currently, we ignore ESLint errors on build as it was integrated midway through development and thus our code does not always follow a consistent style - this is an issue we are working on. However, you can run the following command to build our container via the Dockerfile:
 
-#Build: `docker build -t rcsrc-canada:latest .`
-#Run `docker run -p 3000:80 rcsrc-canada:latest`
+Build: `docker build -t rcsrc-canada:latest .`\n
+Run `docker run -p 3000:80 rcsrc-canada:latest`
 
 This build is also stored on the public Docker registry.
 
