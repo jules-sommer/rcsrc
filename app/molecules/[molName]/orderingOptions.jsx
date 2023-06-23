@@ -13,11 +13,14 @@
 
 import { RadioGroup, Switch, Tab } from '@headlessui/react';
 import {
-	useState, useReducer, useContext, useMemo,
+	useState, useReducer, useContext, useMemo, useEffect,
 } from 'react';
 import { CheckIcon, ChevronDoubleRightIcon } from '@heroicons/react/20/solid';
 import { PRODUCT_LIST } from '../molecules.productList';
 import { CartDispatchContext, CartStateContext } from '../../cartProvider';
+import PropTypes from 'prop-types';
+import Formatter from '../../moneyFormatter';
+import { useParams } from 'next/navigation';
 
 function classNames(...classes) {
 
@@ -29,17 +32,22 @@ const FormatsNote = () => (
 	<>
 		<b>Note:</b>
 		{' '}
-		We offer most of our compounds as both solutions, either aqueous or in a chosen solvent, and in a container of choice; we also offer raw and unprocessed powders in a standard reagent bottles for some products. We occasionally offer products in other formats either upon request or within the ordering form if a product requires unique storage/solvent requirements.
+		{process.env.NEXT_PUBLIC_FORMATS_NOTE}
 	</>
 );
 
-const FormatSelector = ({ formats, dispatch }) => {
+const FormatSelector = ({ formats, dispatch, onSelect, setFormatSelected }) => {
 
 	const { selected } = formats;
 
 	const handleClick = (e) => {
 
 		console.log(e.target.name);
+
+		// check if on select is provided and if it is a function, if so, call it
+		if( typeof onSelect === 'function' && onSelect !== undefined )
+			onSelect();
+
 		const res = dispatch({ type: 'update_format', newFormat: e.target.name });
 
 		console.log(res);
@@ -69,13 +77,46 @@ const FormatSelector = ({ formats, dispatch }) => {
 
 			</div>
 
-			<p className="text-white/50 text-sm"><FormatsNote /></p>
+			<p className="text-white/50 text-sm">
+				<FormatsNote />
+			</p>
 
 		</div>
 
 	);
 
 };
+
+const EmptyStateBeforeFormatSelect = () => {
+
+	return (
+
+		<div className="flex flex-col h-full row-span-6 animate-pulse">
+
+			<span class="w-3/12 bg-slate-600/25 h-4 rounded-md my-2" />
+			<span class="w-4/5 bg-slate-600/25 h-4 rounded-md my-2" />
+
+			<div className="flex flex-grow h-auto flex-col mt-5 justify-between">
+
+				<span class="w-[100%] bg-slate-600/10 h-auto grow rounded-md my-2" />
+				<span class="w-[100%] bg-slate-600/10 h-auto grow rounded-md my-2" />
+				<span class="w-[100%] bg-slate-600/10 h-auto grow rounded-md my-2" />
+
+			</div>
+
+			<div className="flex flex-grow h-auto flex-col mt-5 justify-between">
+
+				<span class="w-[75%] bg-slate-600/10 h-auto grow rounded-md my-2" />
+				<span class="w-[75%] bg-slate-600/10 h-auto grow rounded-md my-2" />
+				<span class="w-[75%] bg-slate-600/10 h-auto grow rounded-md my-2" />
+
+			</div>
+
+		</div>
+
+	);
+
+}
 
 /** TO-DO: MAKE THIS COMPONENT SHARED BETWEEN BOTH POWER AND SOLUTION STATES FOR EFFICIENCY'S SAKE */
 const ContainerSelector = ({ options, dispatch }) => {
@@ -114,27 +155,8 @@ const ContainerSelector = ({ options, dispatch }) => {
 
 	}
 
-	/*  THIS IS AN EMPTY CONTENT PREVIEW TEMPLATE TO SHOW USERS THAT MORE
-				FORMS WILL APPEAR WHEN THEY START THE ORDERING PROCESS */
-
-	return (
-
-		<div className="flex flex-col h-[100%]">
-
-			<span class="w-3/12 bg-slate-600/25 h-4 rounded-md my-2" />
-			<span class="w-4/5 bg-slate-600/25 h-4 rounded-md my-2" />
-
-			<div className="flex flex-grow h-auto flex-col mt-5 justify-between">
-
-				<span class="w-[100%] bg-slate-600/25 h-auto grow rounded-md my-2" />
-				<span class="w-[100%] bg-slate-600/25 h-auto grow rounded-md my-2" />
-				<span class="w-[100%] bg-slate-600/25 h-auto grow rounded-md my-2" />
-
-			</div>
-
-		</div>
-
-	);
+	// this is the default return if no format is selected
+	return <EmptyStateBeforeFormatSelect />;
 
 };
 
@@ -303,6 +325,16 @@ const SolutionComposition = ({ options, dispatch }) => {
 	const totalVolume = selectedQuantity / selectedConcentration;
 
 	const [selectedIndex, setSelectedIndex] = useState(0);
+
+	// TO-DO: make a custom button component with a custom eventHandler that takes in the event and the type of action to dispatch and any custom args
+
+	const handleDispatch = (e, type) => {
+
+		const res = dispatch({ type, selected: e });
+
+		console.log(res);
+
+	};
 
 	const handleToggleSterility = (e) => {
 
@@ -692,11 +724,10 @@ const optionsReducer = (state, action) => {
 
 	case 'update_total_cost':
 
-		if (!action.newCost) {
-
+		if (!action.newCost)
 			return { ...state };
 
-		} if (action.newCost !== state.totalCost || typeof (action.newCost) !== 'number') {
+		if (action.newCost !== state.totalCost || typeof (action.newCost) !== 'number') {
 
 			return {
 				...state,
@@ -717,34 +748,65 @@ const optionsReducer = (state, action) => {
 };
 
 const Alert = ({
-	title, description, type, actions = null,
+	title, description, type, actions = null, isAlertVisible,
 }) => {
+	
+	// TO-DO: define prop types for this component
+
+	Alert.propTypes = {
+		title: PropTypes.string.isRequired,
+		description: PropTypes.string.isRequired,
+		type: PropTypes.string.isRequired,
+		actions: PropTypes.array,
+		isAlertVisible: PropTypes.bool.isRequired,
+	};
 
 	let fontColour;
 	let borderColour;
 
-	if (type === 'warning') {
-
-		fontColour = 'text-rose-400';
-		borderColour = 'border-rose-500';
-
-	} else if (type === 'success') {
-
-		fontColour = 'text-lime-400';
-		borderColour = 'border-lime-500';
+	switch (type) {
+	
+		case 'warning':
+			fontColour = 'text-rose-400';
+			borderColour = 'border-rose-500';
+				break;
+			
+		case 'success':
+			fontColour = 'text-lime-400';
+			borderColour = 'border-lime-500';
+				break;
+			
+		case 'failure':
+			fontColour = 'text-red-400';
+			borderColour = 'border-red-500';
+			break;
+		
+		default:
+			fontColour = 'text-sky-400';
+			borderColour = 'border-sky-500';
+			break;
 
 	}
 
-	return (
+	if (isAlertVisible) {
 
-		<div className={`flex flex-col w-full h-full items-start p-5 justify-center border-2 rounded-2xl ${borderColour}`}>
+		return (
 
-			<h1 className={`font-semibold text-md mb-3 ${fontColour}`}>{title}</h1>
-			<p className={`font-thin text-sm ${fontColour} opacity-75`}>{description}</p>
+			<div className={`flex flex-col w-full h-full items-start p-5 justify-center border-2 rounded-2xl ${borderColour}`}>
 
-		</div>
+				<h1 className={`font-semibold text-md mb-3 ${fontColour}`}>{title}</h1>
+				<p className={`font-thin text-sm ${fontColour} opacity-75`}>{description}</p>
 
-	);
+			</div>
+
+		);
+	
+	} else {
+
+		console.error("No prop passed for isAlertVisible returning null");
+		return null;
+
+	}
 
 };
 
@@ -758,6 +820,11 @@ const OrderingOptions = ({ id, molName, initialOptions }) => {
 
 	const [alert, setAlert] = useState(false);
 
+	// create a state for whether a format has been selected
+	// this state will either be false, indicating no format has been selected, or it will be the format that has been selected
+	// the setFormatSelected function will be passed down to the format selector component, and will be called when a format is selected
+	const [formatSelected, setFormatSelected] = useState(false);
+
 	const { totalCost: _, ...optionsNoTotal } = options;
 
 	console.log(optionsNoTotal);
@@ -769,6 +836,69 @@ const OrderingOptions = ({ id, molName, initialOptions }) => {
 		if (costFunction(options) !== options.totalCost) { dispatch({ type: 'update_total_cost', newCost: costFunction(options) }); }
 
 	}, [optionsNoTotal]);
+
+	const AddToCartButton = ({ formatSelected, costFunction, options }) => {
+
+		AddToCartButton.PropTypes = {
+			formatSelected: PropTypes.oneOfType([
+				PropTypes.string,
+				PropTypes.bool
+			]).isRequired,
+			costFunction: PropTypes.func.isRequired,
+			options: PropTypes.object.isRequired,
+		}
+
+		// options will create an infinite loop if we don't remove the totalCost property from the options object
+		// we can do this by destructuring the options object and removing the totalCost property
+		// this should be done in a local state, so that we don't mutate the original options object
+
+		const { totalCost: _, ...optionsNoTotal } = options;
+
+		// Create a local state to hold the cost of the current configuration using the props passed to this component		
+		const [costOfCurrentConfig, setCostOfCurrentConfig] = useState(0);
+
+		// listen to state to determine if config has changed, if it has, then update the costOfCurrentConfig state
+		useEffect(() => {
+
+			const newCost = costFunction(options);
+
+			if (newCost !== costOfCurrentConfig) setCostOfCurrentConfig(newCost);
+			else console.log('costOfCurrentConfig is the same as the new cost, not updating');
+
+		}, [optionsNoTotal]);
+
+		if (formatSelected !== false) {
+
+			return (
+
+				<div className="flex justify-end">
+					<span className="font-mono px-3 py-2 m-2 mr-0 rounded-l-full border-sky-600 border-2 text-md min-h-[40px] block">
+						
+						{/* using currency formatter function in project root, format cart state context and avoid calling costFunction every time here */}
+						{Formatter.format(costOfCurrentConfig)}
+					</span>
+
+					<button
+						type="submit"
+						className="font-mono px-3 py-2 m-2 ml-0 rounded-r-full bg-gradient-to-tl from-sky-600 to-indigo-500 text-md min-h-[40px] block"
+						onClick={() => {
+							
+							try {
+								addConfigToCart();
+							} catch(e) {
+								console.log(e);
+								setAlert({ title: 'Please select all options!', type: 'warning', description: 'Please select all options before adding to cart!' });
+							}
+						
+						}}>
+						Add to Cart
+					</button>
+				</div>
+
+			)
+		}
+
+	} 
 
 	const addConfigToCart = () => {
 
@@ -784,15 +914,18 @@ const OrderingOptions = ({ id, molName, initialOptions }) => {
 
 				console.log(`We're adding ${JSON.stringify(thisOption, undefined, 2)} to CART at this index: ${index}`);
 
-				if (thisOption.hasOwnProperty('selected')) {
+				{/* 
+					We need to check if the option has a property called 'selected' and if it does, then we need to check if it's true or false
+					If it's false, then we need to add the index to the unselectedVals array
+
+				*/}
+
+				if (Object.hasOwn(thisOption, 'selected')) {
 
 					// This option for product has to be data validated i.e if there is an option selected, then it's okay to add.
 					console.log(`${index} has property that needs to be selected`);
-					if (thisOption.selected === false) {
 
-						unselectedVals.push(index);
-
-					}
+					if (thisOption.selected === false) unselectedVals.push(index);
 
 				}
 
@@ -802,18 +935,31 @@ const OrderingOptions = ({ id, molName, initialOptions }) => {
 
 		if (unselectedVals.length !== 0) {
 
-			setAlert({ title: 'Please select all options!', type: 'warning', description: 'We found some option for this product that were left unselected, please configure your order entirely before adding to cart!' });
-
-		} else {
-
-			// ADD TO CART
-			setAlert({ title: 'Thank you!', type: 'success', description: 'Your item has been added to cart, you can continue shopping or checkout now!!' });
-
-			cartDispatch({ type: 'ADD_TO_CART', cartItem: options });
+			console.log(JSON.stringify(unselectedVals, undefined, 2));
+			
+			throw new Error('Please select all options before adding to cart!');			
 
 		}
 
-		console.log(JSON.stringify(unselectedVals, undefined, 2));
+		// try to dispatch new item to cart, if it fails, then we know that the item is already in the cart, so we can just update the quantity of the item in the cart.
+
+		try {
+			cartDispatch({ type: 'ADD_TO_CART', cartItem: { id: id, ...options } });
+			cartDispatch({ type: 'UPDATE_CART_TOTAL', operator: 'ADD', value: parseFloat(options.totalCost) });
+		} catch (e) {
+			
+			console.log(e);
+			console.log('ITEM ALREADY IN CART, UPDATING QUANTITY INSTEAD');
+
+			// update alert state to show user that the item is already in the cart and that we're updating the quantity instead of adding a new item to the cart.
+			setAlert({ title: 'Item already in cart!', type: 'warning', description: 'This item is already in your cart, we\'re updating the quantity instead of adding a new item to the cart!' });
+			return true;
+
+		}
+
+		// ADD TO CART
+		setAlert({ title: 'Thank you!', type: 'success', description: 'Your item has been added to cart, you can continue shopping or checkout now!!' });
+		return true;
 
 	};
 
@@ -824,36 +970,23 @@ const OrderingOptions = ({ id, molName, initialOptions }) => {
 			<div className="grid grid-cols-7 grid-rows-10 gap-x-16 gap-y-8 bg-sky-700/10 p-10 rounded-xl">
 
 				<div className="col-span-3 row-span-3">
-					<FormatSelector formats={options.format} dispatch={dispatch} />
+					<FormatSelector
+						formats={options.format}
+						dispatch={dispatch}
+						onSelect={() => {
+							setFormatSelected(true);
+						}}
+						setFormatSelected
+					/>
 				</div>
 
 				<div className="col-span-4 row-span-6">
 
 					{(!options.format.selected) ? (
 
-						<div className="flex flex-col h-full row-span-6">
-
-							<span class="w-3/12 bg-slate-600/25 h-4 rounded-md my-2" />
-							<span class="w-4/5 bg-slate-600/25 h-4 rounded-md my-2" />
-
-							<div className="flex flex-grow h-auto flex-col mt-5 justify-between">
-
-								<span class="w-[100%] bg-slate-600/10 h-auto grow rounded-md my-2" />
-								<span class="w-[100%] bg-slate-600/10 h-auto grow rounded-md my-2" />
-								<span class="w-[100%] bg-slate-600/10 h-auto grow rounded-md my-2" />
-
-							</div>
-
-							<div className="flex flex-grow h-auto flex-col mt-5 justify-between">
-
-								<span class="w-[75%] bg-slate-600/10 h-auto grow rounded-md my-2" />
-								<span class="w-[75%] bg-slate-600/10 h-auto grow rounded-md my-2" />
-								<span class="w-[75%] bg-slate-600/10 h-auto grow rounded-md my-2" />
-
-							</div>
-
-						</div>
-
+						// this is the empty state for when no format has been selected
+						<EmptyStateBeforeFormatSelect />
+					
 					) : options.format.selected == 'Solution' ? (
 
 						<SolutionComposition className="" options={options} dispatch={dispatch} />
@@ -868,52 +1001,64 @@ const OrderingOptions = ({ id, molName, initialOptions }) => {
 
 				<div className="col-span-3 font-mono row-span-auto">
 
-					{alert !== false ? (
-						<Alert title={alert.title} type={alert.type} description={alert.description} />
-					) : null}
+					<Alert
+						title={alert.title}
+						type={alert.type}
+						description={alert.description}
+						isAlertVisible={alert}
+					/>
 
 				</div>
-
+				
 				<div className="col-span-3 font-mono row-span-3 p-5 rounded-2xl bg-gradient-to-tl from-sky-950 to-indigo-950">
+					
 					<h1 className="font-semibold text-lg">
 						{molName}
 						{' '}
 						{options.format.selected}
 					</h1>
+					
 					{options.format.selected == 'Solution' ? (
-
+					
 						<>
-							<span className="flex items-center text-white/50 my-2">
-								<ChevronDoubleRightIcon className="h-4 w-4 mx-3" />
-								{options.isSterile ? 'Sterile' : 'Non-Sterile'}
-							</span>
-							<span className="flex items-center text-white/50 my-2">
-								<ChevronDoubleRightIcon className="h-4 w-4 mx-3" />
-								{options.addPreservative ? 'w/ Preservative' : 'w/o Preservative'}
-							</span>
-
-							{options.solvents.selected ? (
-								<span className="flex items-start justify-start text-white/50 my-2">
-									<ChevronDoubleRightIcon className="h-4 w-4 mx-3 shrink-0" />
-									{options.solvents.selected.name}
-								</span>
-							) : null }
-
-							{options.containers.selected ? (
+							
+							<div>
 								<span className="flex items-center text-white/50 my-2">
-									<ChevronDoubleRightIcon className="h-4 w-4 mx-3 shrink-0" />
-									{options.containers.selected.shortHand}
+									<ChevronDoubleRightIcon className="h-4 w-4 mx-3" />
+									{options.isSterile ? 'Sterile' : 'Non-Sterile'}
 								</span>
-							) : null }
+								<span className="flex items-center text-white/50 my-2">
+									<ChevronDoubleRightIcon className="h-4 w-4 mx-3" />
+									{options.addPreservative ? 'w/ Preservative' : 'w/o Preservative'}
+								</span>
 
-							<span className="flex items-center text-white/50 my-2">
-								<ChevronDoubleRightIcon className="h-4 w-4 mx-3" />
-								{options.quantities.selected !== false ? `${options.quantities.values[options.quantities.selected]} ${options.quantities.unit}` : false }
-							</span>
+								{options.solvents.selected ? (
+									<span className="flex items-start justify-start text-white/50 my-2">
+										<ChevronDoubleRightIcon className="h-4 w-4 mx-3 shrink-0" />
+										{options.solvents.selected.name}
+									</span>
+								) : null }
+
+								{options.containers.selected ? (
+									<span className="flex items-center text-white/50 my-2">
+										<ChevronDoubleRightIcon className="h-4 w-4 mx-3 shrink-0" />
+										{options.containers.selected.shortHand}
+									</span>
+								) : null }
+
+								<span className="flex items-center text-white/50 my-2">
+									<ChevronDoubleRightIcon className="h-4 w-4 mx-3" />
+									{options.quantities.selected !== false ? `${options.quantities.values[options.quantities.selected]} ${options.quantities.unit}` : false }
+								</span>
+							
+							</div>
 
 						</>
 
-					) : (
+					) : null }
+					
+					{ /* Powder, only shown if format is selected, i.e not false, and its value is equal to powder */ }
+					{options.format.selected == 'Powder' ? (
 
 						<>
 
@@ -926,23 +1071,23 @@ const OrderingOptions = ({ id, molName, initialOptions }) => {
 								<span className="flex items-center text-white/50">
 									<ChevronDoubleRightIcon className="h-4 w-4 mx-3" />
 									{options.containers.selected.shortHand}
-								</span>
+									</span>
 							) : null }
-
+									
 						</>
+		
+					) : null }
 
-					)}
-
-					<div className="flex justify-end">
-						<span className="font-mono px-3 py-2 m-2 mr-0 rounded-l-full border-sky-600 border-2 text-md min-h-[40px] block">
-							$
-							{costFunction(options)}
-						</span>
-						<button type="submit" className="font-mono px-3 py-2 m-2 ml-0 rounded-r-full bg-gradient-to-tl from-sky-600 to-indigo-500 text-md min-h-[40px] block" onClick={addConfigToCart}>Add to Cart</button>
+					{/* AddToCartButton has own state to determine if it should be shown */}			
+					
+					<AddToCartButton
+						formatSelected={formatSelected}
+						costFunction={costFunction}
+						options={options}
+							/>								
+						
 					</div>
-
-				</div>
-
+		
 			</div>
 
 			<span>
@@ -950,6 +1095,7 @@ const OrderingOptions = ({ id, molName, initialOptions }) => {
 				{' '}
 				{Object.keys(options).length}
 			</span>
+
 			<pre className="text-clip overflow-hidden">{JSON.stringify(options, undefined, 4)}</pre>
 
 		</>
