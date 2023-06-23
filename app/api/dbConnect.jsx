@@ -4,17 +4,17 @@ const uri = `mongodb+srv://${MONGO_DB_USER}:${MONGO_DB_PASSWORD}@rcsrc-canada.vw
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
-const client = new MongoClient(uri, {
-    
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true
-    },
-
-});
-
 const dbConnect = async () => {
+
+    const client = new MongoClient(uri, {
+    
+        serverApi: {
+            version: ServerApiVersion.v1,
+            strict: true,
+            deprecationErrors: true
+        },
+    
+    });
 
     try {
         // Connect the client to the server	(optional starting in v4.7)

@@ -13,38 +13,34 @@ import Image from 'next/image';
 import { CartStateContext, CartDispatchContext } from '../../cartProvider';
 import CartListItem from '../../CartListItem';
 import Formatter from '../../moneyFormatter';
+import { useIsClient } from '../../isClientProvider';
+import { useCartOpen } from '../../useCartOpen';
 
 const CartModal = () => {
 
 	const router = useRouter();
 	const pathname = usePathname();
 
+	const isOpen = useCartOpen();
+
+	console.log(`CART IS OPEN: ${isOpen} ( from cartModal.jsx )`);
+
 	const state = useContext(CartStateContext);
 	const cartDispatch = useContext(CartDispatchContext);
-
-	const setOpenState = (isOpen) => {
-
-		cartDispatch({ type: 'TOGGLE_OPEN', isOpen, pathname });
-		router.push(state.isOpen.returnUrl);
-
-	};
 
 	// eslint-disable-next-line react/destructuring-assignment
 
 	return (
 		<Transition.Root
-			show={state.isOpen.state}
+			show={isOpen}
 			appear
 			as={Fragment}
-			afterLeave={() => {
-				setOpenState(false);
-			}}
 		>
 			<Dialog
 				as="div"
 				className="relative z-50"
 				onClose={() => {
-					setOpenState(false);
+					router.back();
 				}}
 			>
 				<Transition.Child
@@ -86,7 +82,7 @@ const CartModal = () => {
 												type="button"
 												className="rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
 												onClick={() => {
-													setOpenState(false);
+													router.back();
 												}}
 											>
 												<span className="sr-only">Close panel</span>
@@ -137,6 +133,17 @@ const CartModal = () => {
 											Total Cost:
 											{Formatter.format(parseFloat(state.cartTotal))}
 										</p>
+
+										<div>
+
+											<button
+												type='submit'
+												onClick={() => {
+													router.push('/cart/checkout');
+												}}
+												>Checkout</button>
+
+										</div>
 
 									</div>
 								</Dialog.Panel>

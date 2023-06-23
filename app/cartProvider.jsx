@@ -5,16 +5,15 @@
 
 'use client';
 
-import { v4 as uuidv4 } from 'uuid';
 import { uniqueId } from 'lodash';
 
 import {
-	createContext, useReducer, useEffect,
+	createContext, useReducer, useEffect, useMemo,
 } from 'react';
 
 import { useIsClient } from './isClientProvider';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import _ from 'lodash';
 import { ST } from 'next/dist/shared/lib/utils';
@@ -25,6 +24,7 @@ export const CartDispatchContext = createContext(null);
 const CartContextProvider = ({ children }) => {
 
 	const pathname = usePathname();
+	const router = useRouter();
 	const isClient = useIsClient();
 
 	const cartReducer = (state, action) => {
@@ -126,9 +126,11 @@ const CartContextProvider = ({ children }) => {
 			// updates the UI for cart open or closed
 			case 'TOGGLE_OPEN':
 
-			console.log(pathname);
+			console.log(action.pathname);
 
 			if (action.isOpen == true) {
+
+				router.push('/cart');
 
 				return {
 
@@ -142,12 +144,17 @@ const CartContextProvider = ({ children }) => {
 
 			} if (action.isOpen == false) {
 
+				if (action.pathname !== false)
+					router.push(action.pathname);
+				else
+					router.push(state.isOpen.returnUrl);
+
 				return {
 
 					...state,
 					isOpen: {
 						state: false,
-						returnUrl: null,
+						returnUrl: false,
 					},
 
 				};
@@ -173,7 +180,6 @@ const CartContextProvider = ({ children }) => {
 		cartTotal: 0,
 		paymentMethod: false,
 		isEmpty: true,
-		isOpen: { state: false, returnUrl: null },
 
 	};
 
@@ -181,14 +187,16 @@ const CartContextProvider = ({ children }) => {
 
 	useEffect(() => {
 
-		if (JSON.parse(localStorage.getItem('cartStore')))
-			dispatch({ type: 'LOCAL_STORE_EXISTS', value: JSON.parse(localStorage.getItem('cartStore')) });
+		const localStore = JSON.parse(localStorage.getItem('cartStore'));
+
+		if (localStore)
+			dispatch({ type: 'LOCAL_STORE_EXISTS', value: localStore });
 			
 	}, []);
 
-	useEffect(() => {
+	useMemo(() => {
 
-		if (state !== initialState)
+		if (isClient && state !== initialState)
 			window.localStorage.setItem('cartStore', JSON.stringify(state));
 
 	}, [state.items]);

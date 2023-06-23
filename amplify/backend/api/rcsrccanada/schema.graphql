@@ -1,0 +1,27 @@
+type Checkout @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  paymentMethod: String
+  agreeToTOS: Boolean
+  firstName: String
+  lastName: String
+  researchOrg: String
+  emailAddress: AWSEmail
+  items: [ID!]!
+  MoleculesInCheckout: [Molecule] @hasMany(indexName: "byCheckout", fields: ["id"])
+}
+
+type InStock {
+  amount: [Int!]
+  unit: String
+}
+
+type Molecule @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  molName: [String!]!
+  molCAS: String!
+  molIUPAC: String!
+  molSMILES: String!
+  inStock: InStock
+  checkoutID: ID! @index(name: "byCheckout")
+}
+ 
