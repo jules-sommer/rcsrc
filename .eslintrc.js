@@ -1,6 +1,6 @@
 module.exports = {
 	root: true,
-	depedencies: ['eslint-config-airbnb'],
+	dependencies: ['eslint-config-airbnb'],
 	rules: {
 		'linebreak-style': [0, 'windows'],
 		indent: [2, 'tab'],

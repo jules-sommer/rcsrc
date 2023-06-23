@@ -20,6 +20,7 @@ import { PRODUCT_LIST } from '../molecules.productList';
 import { CartDispatchContext, CartStateContext } from '../../cartProvider';
 import PropTypes from 'prop-types';
 import Formatter from '../../moneyFormatter';
+import { useParams } from 'next/navigation';
 
 function classNames(...classes) {
 
@@ -90,7 +91,7 @@ const EmptyStateBeforeFormatSelect = () => {
 
 	return (
 
-		<div className="flex flex-col h-full row-span-6">
+		<div className="flex flex-col h-full row-span-6 animate-pulse">
 
 			<span class="w-3/12 bg-slate-600/25 h-4 rounded-md my-2" />
 			<span class="w-4/5 bg-slate-600/25 h-4 rounded-md my-2" />

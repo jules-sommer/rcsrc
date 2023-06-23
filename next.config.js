@@ -1,3 +1,5 @@
+const CopyPlugin = require("copy-webpack-plugin");
+
 /** @type {import('next').NextConfig} */
 module.exports = {
 	output: 'standalone',
@@ -11,4 +13,16 @@ module.exports = {
 		// your project has ESLint errors.
 		ignoreDuringBuilds: true,
 	},
+
+	images: {
+		remotePatterns: [
+			{
+			protocol: 'https',
+			hostname: 'pubchem.ncbi.nlm.nih.gov',
+			port: '',
+			pathname: '/**',
+			},
+		],
+	}
+
 }
