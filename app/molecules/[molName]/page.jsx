@@ -1,13 +1,25 @@
-/* eslint-disable react/react-in-jsx-scope */
-
-'use client';
-
-import { useEffect } from 'react';
 import Image from 'next/image';
-import { PRODUCT_LIST } from '../molecules.productList';
+import { Suspense } from 'react';
 import OrderingOptions from './orderingOptions';
+import { titleize, slugify } from '../../utils';
 
-const MoleculePage = ({ params }) => {
+import MoleculeInfo from './MoleculeInfo';
+import MoleculeInfoSkeleton from './MoleculeInfoSkeleton';
+
+const getProductByName = async (prodName) => {
+
+    console.log(`${Date.now()}: getProductByName("${prodName}") called...`);
+
+    const res = await fetch(`http://localhost:3000/api/products/molName?val=${slugify(prodName)}`);
+    const resJSON = await res.json();
+
+	console.log(`${Date.now().toLocaleString('US')}: getProductByName(${prodName}) => ${res}`)
+
+    return resJSON;
+
+};
+
+const MoleculePage = async ({ params }) => {
 
 	MoleculePage.propTypes = {
 
@@ -17,94 +29,42 @@ const MoleculePage = ({ params }) => {
 
 	};
 
-	const thisProduct = PRODUCT_LIST.filter((thisProductInArr) => {
+	const product = await getProductByName(params.molName);
 
-		const thisNormalized = thisProductInArr.molName.trim().replace(/\W+/g, '-').toLowerCase();
-		const paramNormalized = params.molName.trim().replace(/\W+/g, '-').toLowerCase();
+	console.log('DATA FROM MOLNAME PAGE');
+	console.log(product);
 
-		return thisNormalized == paramNormalized;
+	if (product ) {
 
-	})[0];
-
-	// CART ITEM Obj that gets sent down to order configurator
-	const cartItem = {
-		id: thisProduct.id,
-		molName: thisProduct.molName,
-		molImg: thisProduct.molImg,
-		CAS: thisProduct.CAS,
-		...thisProduct.orderingOptions,
-		totalCost: null,
-	};
-
-	useEffect(() => {
-
-		console.log(`CART ITEM: ${JSON.stringify(cartItem, undefined, 4)}`);
-
-	});
-
-	if (thisProduct !== undefined) {
-
+		// CART ITEM Obj that gets sent down to order configurator
+		const cartItem = {
+			id: product._id,
+			molName: product.molName,
+			molImg: product.molImg,
+			CAS: product.CAS,
+			...product.orderingOptions,
+			totalCost: null,
+		};
+ 
 		return (
 
 			<section className="bg-slate-950 h-auto pt-16">
 
-				<div className="flex w-[100%] px-12 mx-auto">
-
-					<div className="w-64 h-64 flex-shrink-0 rounded-2xl inline-flex mr-24 items-center bg-indigo-100 ring-1 ring-inset ring-indigo-600-700/30">
-						<Image
-							className="!h-auto !w-auto !relative "
-							src={thisProduct.molImg}
-							alt={thisProduct.molName}
-							fill
-						/>
-					</div>
-
-					<div className="text-sky-100 flex flex-col font-mono title w-9/12 mx-auto mb-8">
-
-						<h1 className="text-4xl">{thisProduct.molName}</h1>
-
-						<span className="my-5">
-
-							<h2 className="text-md text-sky-100/50">
-								<b className="text-sky-100/75">CAS#</b>
-								{' '}
-								{thisProduct.CAS}
-							</h2>
-							<h2 className="text-md text-sky-100/50">
-								<b className="text-sky-100/75">IUPAC:</b>
-								{' '}
-								{thisProduct.iupac}
-							</h2>
-
-						</span>
-
-						<div className="flex flex-row my-5">
-
-							{thisProduct.tags.map((thisTag) => (
-								<span className="inline-flex mr-2 items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-blue-700/30">{thisTag}</span>
-							))}
-
-						</div>
-
-						<div>
-
-							<p className="font-sans leading-loose my-5 text-lg font-light">{thisProduct.description}</p>
-
-						</div>
-
-					</div>
-
-				</div>
+				<Suspense fallback={<MoleculeInfoSkeleton />}>
+					<MoleculeInfo product={product} />
+				</Suspense>
 
 				<div className="py-16 text-sky-100 flex flex-col font-mono mx-16">
 
 					<div className="text-2xl mb-6">Ordering</div>
 
-					<OrderingOptions
-						id={thisProduct.id}
-						molName={thisProduct.molName}
-						initialOptions={cartItem}
-					/>
+					{/*
+						<OrderingOptions
+							id={thisProduct.id}
+							molName={thisProduct.molName}
+							initialOptions={cartItem}
+						/>
+					*/}
 
 				</div>
 
@@ -112,17 +72,16 @@ const MoleculePage = ({ params }) => {
 
 		);
 
+	} else {
+
+		return (
+		
+			<h1>Error: Couldn't find product.</h1>
+
+		)
+
 	}
 
-	return (
-
-		<h1>
-			Couldn&apos;t find a product with the id:
-			{' '}
-			{params.id}
-		</h1>
-
-	);
 
 };
 

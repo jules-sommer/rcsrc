@@ -8,8 +8,8 @@ const Footer = () => (
             <nav className='w-9/12 mx-auto my-10 flex justify-center select-none items-center border-b-slate-950 mb-5'>
                 <NavLink href='/about'>About</NavLink>
                 <NavLink href='/molecules'>Molecules</NavLink>
-                <NavLink href='/molecules'>Terms of Service</NavLink>
-                <NavLink href='/molecules'>News & Updates</NavLink>
+                <NavLink href='/tos'>Terms of Service</NavLink>
+                <NavLink href='/news'>News & Updates</NavLink>
             </nav>
         </footer>
 
