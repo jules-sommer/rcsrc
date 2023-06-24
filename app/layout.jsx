@@ -9,8 +9,9 @@ import { ClientProvider, useIsClient } from './isClientProvider';
 
 import UseAwsAuth from './useAwsAuth';
 
-import LogRocket from 'logrocket';
-LogRocket.init('llbux5/rcsrc-canada-web');
+import { Amplify } from 'aws-amplify';
+import awsExports from './aws-exports';
+Amplify.configure({ ...awsExports, ssr: true });
 
 import ShowGlobalState from './ShowGlobalState';
 

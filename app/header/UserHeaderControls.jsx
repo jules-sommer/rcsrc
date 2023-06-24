@@ -24,7 +24,7 @@ const UserHeaderControls = () => {
 
     }
 
-    if (!authedUser.isAuthorized) {
+    if (!authedUser.isAuthenticated) {
         
         return (
 
@@ -34,9 +34,9 @@ const UserHeaderControls = () => {
                     variation={'default'}
                     onClick={signInRedirect}
                     size="small"
-                    className="font-mono text-sky-200 rounded-md border-sky-700 hover:border-indigo-400 hover:bg-indigo-400"
+                    className="font-mono inline-flex text-sky-200 rounded-md border-sky-600 hover:border-sky-600 hover:bg-sky-600"
                 >
-                    <span className='material-symbols-rounded h-24 w-24'>
+                    <span className='material-symbols-rounded p-0'>
                         login
                     </span>
                     <span class="ml-2">
