@@ -34,6 +34,7 @@ export { default as Ampligram } from "./Ampligram";
 export { default as ActionCard } from "./ActionCard";
 export { default as studioTheme } from "./studioTheme";
 export { default as CheckoutUpdateForm } from "./CheckoutUpdateForm";
+export { default as CheckoutAwsQl } from "./CheckoutAwsQl";
 export { default as CheckoutCreateForm } from "./CheckoutCreateForm";
 export { default as MoleculeCreateForm } from "./MoleculeCreateForm";
 export { default as MoleculeUpdateForm } from "./MoleculeUpdateForm";

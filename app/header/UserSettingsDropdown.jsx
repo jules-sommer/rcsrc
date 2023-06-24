@@ -3,7 +3,7 @@
 import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { View, Button } from "@aws-amplify/ui-react";
+import { View, Button, VisuallyHidden } from "@aws-amplify/ui-react";
 import Link from 'next/link';
 
 const classNames = (...classes) => classes.filter(Boolean).join(' ');
@@ -31,6 +31,7 @@ const UserSettingsDropdown = () => {
 						<span className="material-symbols-rounded !inline-flex items-center justify-center py-4 px-2 w-2 h-2 text-lg">
 							arrow_drop_down
 						</span>
+						<VisuallyHidden>Menu open button for my account settings...</VisuallyHidden>
 					</Button>
 				</Menu.Button>
 				

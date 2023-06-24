@@ -5,7 +5,7 @@ const MONGO_DB_PASS = process.env.MONGO_DB_PASS;
 
 const MONGO_DB_URL = `mongodb+srv://${MONGO_DB_USER}:${MONGO_DB_PASS}@rcsrc-canada.vwhedxp.mongodb.net/`;
 
-export async function getMongoClient() {
+export const getMongoClient = async () => {
     /**
      * Global is used here to maintain a cached connection across hot reloads
      * in development. This prevents connections growing exponentiatlly
@@ -13,7 +13,7 @@ export async function getMongoClient() {
      * https://github.com/vercel/next.js/pull/17666
      */
     if (!global.mongoClientPromise) {
-        const client = new MongoClient(MONGO_DB_URL);
+        const client = new MongoClient(MONGO_DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
         // client.connect() returns an instance of MongoClient when resolved
         global.mongoClientPromise = client.connect()
     }
@@ -22,8 +22,9 @@ export async function getMongoClient() {
 
 }
 
-export async function getMongoDb() {
+export const getMongoDb = async (dbName) => {
 
     const mongoClient = await getMongoClient();
-    return mongoClient.db();
+    return mongoClient.db(dbName);
+
 }
