@@ -9,7 +9,7 @@ const Header = () => {
 
     return (
 
-        <header className='p-5 bg-sky-900/60 z-50 left-0 right-0 flex justify-between items-center backdrop-blur-md fixed max-h-[86px] overflow-visible'>
+        <header className='p-5 bg-sky-900/60 z-50 left-0 right-0 flex justify-between items-center backdrop-blur-md fixed h-[86px] overflow-visible'>
             <div className='w-9/12 mx-auto flex justify-between items-center'>
                 
                 <Link href='/' className="flex items-center justify-center">

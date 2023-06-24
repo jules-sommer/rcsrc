@@ -9,14 +9,12 @@ import { useEffect } from "react";
 import { ThemeProvider } from "@aws-amplify/ui-react";
 import { Amplify } from 'aws-amplify';
 
-import awsconfig from './aws-exports';
-
 import { studioTheme } from "./ui-components";
+import awsExports from './aws-exports';
 
-Amplify.configure({ ...awsconfig, ssr: true });
+Amplify.configure({ ...awsExports, ssr: true });
 
 import "@aws-amplify/ui-react/styles.css";
-import { View } from '@aws-amplify/ui-react';
 import { Authenticator } from "@aws-amplify/ui-react";
 
 /** ***********************************
@@ -24,12 +22,6 @@ import { Authenticator } from "@aws-amplify/ui-react";
  * ***********************************/
 
 const UseAwsAuth = ({ children }) => {
-
-    useEffect(() => {
-
-        
-
-    }, []);
 
     return (
 
