@@ -31,13 +31,15 @@ export const GET = async (request, context) => {
         }, { status: 200 });
 
     } catch {(err) => {
+
         console.log(err);
+        
         return NextResponse.json({
             success: false,
             message: `/api/products/molSlug/${contextParams} errored`,
             data: err,
         }, { status: 400 });
+    
     }}
-
 
 } 

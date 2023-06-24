@@ -1,0 +1,16 @@
+{
+  "resourceName": "content",
+  "policyUUID": "8c3bbc7a",
+  "bucketName": "rcsrccanada-content",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}
