@@ -1,4 +1,5 @@
 import Image from "next/image"
+import SmileDrawerContainer from "../molecules/SmilesDrawerContainer"; // ({ SMILES, theme='dark', height, width, className })
 
 String.prototype.truncate = String.prototype.truncate || 
 function ( n, useWordBoundary ){
@@ -9,17 +10,18 @@ function ( n, useWordBoundary ){
     : subString) + "...";
 };
 
-const FeaturedCard = ({ molName, CAS, description, molImg }) => {
+const FeaturedCard = ({ molName, CAS, description, molSmiles }) => {
 
 	return (
 
 		<div className='h-[100%] w-[100%] transition-all cursor-pointer hover:origin-center hover:scale-[1.025] bg-gradient-to-t from-indigo-200 via-blue-200 to-sky-200 rounded-2xl'>
 			<div className='w-[100%] h-52 rounded-2xl bg-transparent'>
-				<Image 
-					className='!h-auto !w-auto !relative'
-					src={molImg}
-					alt={molName}
-					fill={true}
+				<SmileDrawerContainer
+					SMILES={molSmiles}
+					height={"100%"}
+					width={"100%"}
+					theme="github"
+					className={`w-full h-52 p-4 pb-6`}
 				/>
 			</div>
 			<div className='information p-7'>

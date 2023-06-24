@@ -34,7 +34,7 @@ export default function RootLayout({ children, cart }) {
 
 								{cart}
 
-								<main className='pt-[72px] bg-slate-950'>{children}</main>
+								<main className='pt-[86px] bg-slate-950'>{children}</main>
 
 								{process.env.IS_DEVELOPMENT === true ? <ShowGlobalState /> : null}
 
