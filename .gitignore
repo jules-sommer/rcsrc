@@ -34,6 +34,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+#more amplify stuff
+amplify/team-provider-info.json
+
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend
 amplify/.config/local-*
@@ -44,6 +47,7 @@ amplify/backend/amplify-meta.json
 amplify/backend/.temp
 build/
 dist/
+aws-exports.js
 node_modules/
 awsconfiguration.json
 amplifyconfiguration.json
