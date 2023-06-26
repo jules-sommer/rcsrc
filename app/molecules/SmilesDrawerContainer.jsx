@@ -226,7 +226,7 @@ const SmileDrawerContainer = ({ SMILES, theme='dark', height, width, className }
 
     return (
         <div className={className}>
-            <img ref={imgRef}/>
+            <img ref={imgRef} className="w-full"/>
         </div>
     );
 };

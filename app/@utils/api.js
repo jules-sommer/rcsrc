@@ -16,6 +16,15 @@ export const getProductByScaffold = async (scaffold) => {
 
 }
 
+export const getProductByIsFeatured = async (isFeatured, limit = 4) => {
+
+    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/isFeatured/${isFeatured}?limit=${limit}`);
+    const result = await raw.json();
+    
+    return result;
+
+}
+
 export const getProductBySlug = async (molSlug) => {
 
     const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/molSlug/${molSlug}`);

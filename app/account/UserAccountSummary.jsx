@@ -13,14 +13,16 @@ const UserAccountSummary = () => {
 
     const [authedUser, setAuthedUser, signOut] = useUserInfo();
 
-    if (!authedUser.isAuthorized) {
+    console.log(authedUser)
+
+    if (!authedUser.isAuthenticated) {
 
         return (
 
             <View className="flex items-center justify-center h-full w-full py-24">
 
                 <Authenticator
-                    className='w-96 bg-gradient-to-br from-sky-900 to-sky-800 rounded-md shadow-lg p-8'
+                    className='w-auto bg-gradient-to-br from-sky-900 to-sky-800 rounded-md shadow-lg p-8'
                     loginMechanisms={['username', 'phone_number', 'email']}
                     socialProviders={['google']}
                 />

@@ -1,46 +1,38 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react';
-import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react';
+import { useAuthenticator } from '@aws-amplify/ui-react';
 import { Auth } from 'aws-amplify';
+import awsExports from '../aws-exports';
+import { Amplify } from 'aws-amplify';
+
+Amplify.configure({ ...awsExports, ssr: true });
 
 const useUserInfo = () => {
 
-    const { user, signOut } = useAuthenticator((context) => [context.user])
+    const { route, user, signOut } = useAuthenticator((context) => [context.user])
     const [ authedUser, setAuthedUser ] = useState({});
 
     useEffect(() => {
 
-        Auth.currentAuthenticatedUser({
-            bypassCache: false // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
-        })
-            .then((thisUser) => {
-            
-                setAuthedUser({
-                    ...thisUser.signInUserSession.idToken.payload,
-                    roles: thisUser.signInUserSession.idToken.payload["cognito:groups"],
-                    ['cognito:groups']: _, // removes awkward key of 'cognito:groups', since we replaced it with 'roles' above
-                    isAuthorized: true,
-                    //cartStore: JSON.parse(thisUser.pool.storage.store.cartStore),
-                });
+        // i.e user is authenticated
+        if (route === 'authenticated') {
 
-                console.log(authedUser);
-
-            })
-            .catch((err) => {
-
-                console.log(err);
-
-                if (err) {
-                    setAuthedUser({ isAuthorized: false, error: err });
-                    return [authedUser, setAuthedUser];
-                }
-                
+            setAuthedUser({
+                ...user.signInUserSession.idToken.payload,
+                roles: user.signInUserSession.idToken.payload["cognito:groups"],
+                ['cognito:groups']: _,
+                cartStore: JSON.parse(user.pool.storage.store.cartStore),
+                isAuthenticated: true
             });
-        
-        console.log(authedUser);
-            
-        }, [user]);
+
+        } else {
+            setAuthedUser({ isAuthenticated: false });
+        }
+
+        console.log(`authedUser: ${JSON.stringify(authedUser)} (useUserInfo.jsx)`);
+
+    }, [user]);
         
     return [
         authedUser,
