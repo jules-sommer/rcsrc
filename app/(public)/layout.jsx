@@ -10,6 +10,8 @@ require('better-logging')(console);
 import CartContextProvider from '../_providers/cartProvider';
 import { ClientProvider, useIsClient } from '../_providers/isClientProvider';
 
+import UseReduxStore from '../_providers/UseReduxStore';
+
 import { UseNextAuth } from '../_providers/UseNextAuth';
 import { SessionProvider } from 'next-auth/react';
 
@@ -33,10 +35,16 @@ export default function RootLayout({ children, cart, ...pageProps }) {
 
 			<body>
 				
-				<UseNextAuth>
-					<UseAwsAuth>
-						<ClientProvider>
-							<CartContextProvider>
+				<UseReduxStore>
+
+					<UseNextAuth>
+
+						<UseAwsAuth>
+
+							<ClientProvider>
+
+								<CartContextProvider>
+
 									<Header />
 
 									{cart}
@@ -44,10 +52,17 @@ export default function RootLayout({ children, cart, ...pageProps }) {
 									<main className='pt-[86px] bg-slate-950'>{children}</main>
 
 									<Footer />
-							</CartContextProvider>
-						</ClientProvider>
-					</UseAwsAuth>
-				</UseNextAuth>
+									
+								</CartContextProvider>
+
+							</ClientProvider>
+
+						</UseAwsAuth>
+
+					</UseNextAuth>
+
+				</UseReduxStore>
+
 			</body>
 	
 		</html>

@@ -36,6 +36,7 @@ next-env.d.ts
 
 #more amplify stuff
 amplify/team-provider-info.json
+amplify/team-provider-info.json
 
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend
