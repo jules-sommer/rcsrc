@@ -1,49 +1,55 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAction, createReducer } from '@reduxjs/toolkit';
 import { HYDRATE } from "next-redux-wrapper";
 
 // Initial state
 const initialState = {
-	sub: "",
-	email: "",
-	authState: "unauthenticated",
-	token: "",
+	
+	users: [
+
+		{
+			sub: "",
+			email: "",
+			authState: "unauthenticated",
+			token: "",
+		},
+
+	],
+
 };
 
-// Actual Slice
-export const authSlice = createSlice({
-	name: "users",
-	initialState,
-	reducers: {
-		// Action to set the authentication status
-		addNewUser(state, action) {
 
-			const { sub, email, authState, token } = action.payload;
+export const logInUser = createAction('users/logIn');
+export const signOutUser = createAction('users/signOut');
 
-			state = {
-				...state,
-				sub: sub,
-				email: email,
-				authState: authState,
-				token: token,
-			};
+export const authReducer = createReducer((initialState, (builder) => {
 
-		},
-	},	
+	builder
+		.addCase(logInUser, (state, action) => {
 
-	// Special reducer for hydrating the state. Special case for next-redux-wrapper
-	extraReducers: {
-		[HYDRATE]: (state, action) => {
 			return {
+
 				...state,
-				...action.payload.auth,
-			};
-		},
-	},
+				users: [
+					...state.users,
+					{
+						...action.payload
+					}
+				]
 
-});
+			}
 
-export const { addNewUser } = authSlice.actions;
+		})
+		.addCase(signOutUser, (state, action) => {
 
-export const selectAuthState = (state) => state.auth.authState;
+			return {
 
-export default authSlice.reducer;
+				...state,
+				items: state.items.filter((item) => {
+					return item.sub !== action.payload.sub;
+				})
+
+			}
+
+		});
+
+}));

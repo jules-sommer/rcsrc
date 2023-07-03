@@ -1,9 +1,15 @@
 import { MongoClient } from 'mongodb';
 
+if (!process.env.MONGO_DB_USER || !process.env.MONGO_DB_PASS) {
+    throw new Error('Invalid/Missing environment variable: "MONGO_DB_USER" or "MONGO_DB_PASS"');
+}
+
 const MONGO_DB_USER = process.env.MONGO_DB_USER;
 const MONGO_DB_PASS = process.env.MONGO_DB_PASS;
 
 const MONGO_DB_URL = `mongodb+srv://${MONGO_DB_USER}:${MONGO_DB_PASS}@rcsrc-canada.vwhedxp.mongodb.net/`;
+
+const options = { useNewUrlParser: true, useUnifiedTopology: true };
 
 export const getMongoClient = async () => {
     /**
@@ -13,7 +19,7 @@ export const getMongoClient = async () => {
      * https://github.com/vercel/next.js/pull/17666
      */
     if (!global.mongoClientPromise) {
-        const client = new MongoClient(MONGO_DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+        const client = new MongoClient(MONGO_DB_URL, options);
         // client.connect() returns an instance of MongoClient when resolved
         global.mongoClientPromise = client.connect()
     }
@@ -32,13 +38,6 @@ export const getMongoDb = async (dbName) => {
 // This approach is taken from https://github.com/vercel/next.js/tree/canary/examples/with-mongodb //
 // ************************************************************************************************//
 
-if (!process.env.DATABASE_URL) {
-    throw new Error('Invalid/Missing environment variable: "MONGO_DB_URL"');
-}
-
-const uri = process.env.DATABASE_URL;
-const options = { useNewUrlParser: true, useUnifiedTopology: true };
-
 let client;
 let clientPromise = MongoClient;
 
@@ -47,7 +46,7 @@ if (process.env.NODE_ENV === "development") {
 	// In development mode, use a global variable so that the value
 	// is preserved across module reloads caused by HMR (Hot Module Replacement).
 	if (!global._mongoClientPromise) {
-		client = new MongoClient(uri, options);
+		client = new MongoClient(MONGO_DB_URL, options);
 		global._mongoClientPromise = client.connect();
 	}
 

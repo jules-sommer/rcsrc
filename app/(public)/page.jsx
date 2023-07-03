@@ -48,7 +48,8 @@ const Home = async () => {
 
                 <div class="w-[100%] px-12 grid grid-cols-4 grid-rows-1 grid-flow-col gap-4">
                     
-                    {data.map((thisProduct, index) => (
+                    {typeof data === Array && data
+                        ? data.map((thisProduct, index) => (
                         <FeaturedCard
                             key={thisProduct._id}
                             molName={thisProduct.molName}
@@ -57,7 +58,7 @@ const Home = async () => {
                             molSMILES={thisProduct.molSMILES}
                             description={thisProduct.description}
                         />
-                    ))}
+                    )) : null}
                     
 				</div>
 

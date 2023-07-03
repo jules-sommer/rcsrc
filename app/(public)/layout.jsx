@@ -10,10 +10,10 @@ require('better-logging')(console);
 import CartContextProvider from '../_providers/cartProvider';
 import { ClientProvider, useIsClient } from '../_providers/isClientProvider';
 
-import UseReduxStore from '../_providers/UseReduxStore';
-
 import { UseNextAuth } from '../_providers/UseNextAuth';
 import { SessionProvider } from 'next-auth/react';
+
+import WithReduxState from '../_providers/WithReduxProvider';
 
 import UseAwsAuth from '../_providers/useAwsAuth';
 
@@ -27,15 +27,15 @@ export const metadata = {
 	description: 'Leader in novel research chemicals and APIs.',
 }
 
-export default function RootLayout({ children, cart, ...pageProps }) {
+const RootLayout = ({ children, cart, ...pageProps }) => {
 
 	return (
 	
 		<html lang="en">
 
 			<body>
-				
-				<UseReduxStore>
+
+				<WithReduxState>
 
 					<UseNextAuth>
 
@@ -61,7 +61,7 @@ export default function RootLayout({ children, cart, ...pageProps }) {
 
 					</UseNextAuth>
 
-				</UseReduxStore>
+				</WithReduxState>
 
 			</body>
 	
@@ -70,3 +70,5 @@ export default function RootLayout({ children, cart, ...pageProps }) {
 	)
 
 }
+
+export default RootLayout;
