@@ -28,7 +28,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "app/(public)/account/LoginForm.tsx"  ],
+, "app/(public)/account/LoginForm.tsx", "app/api/products/inStock/[bool]/route.js"  ],
   "exclude": [
     "node_modules"
   ]
