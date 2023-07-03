@@ -20,7 +20,7 @@ export const useUserInfo = () => {
         
             case 'signIn':
         
-                router.push('/account');
+                router.push('/account').reload();
                 
                 setLatestAuthEvent({
                     type: 'signIn',
