@@ -6,10 +6,9 @@ import { Amplify } from 'aws-amplify'
 import _ from 'lodash';
 import chalk from 'chalk'
 
-Amplify.Logger.LOG_LEVEL = 'DEBUG';
 Amplify.configure({ ...awsExports, ssr: true });
 
-const DashboardLayout = async (request, context, { children }) => {
+const DashboardLayout = async ({ children }) => {
     
     const headerCookie = headers().get('cookie');
 

@@ -1,5 +1,6 @@
 'use client'
 import { useUserInfo } from './useUserInfo';
+import { redirect } from 'next/navigation';
 
 const AuthenticatorWrapper = ({ children }) => {
 
