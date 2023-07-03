@@ -7,185 +7,18 @@
 /* eslint-disable */
 import * as React from "react";
 import {
-  Autocomplete,
-  Badge,
   Button,
-  Divider,
   Flex,
   Grid,
-  Icon,
-  ScrollView,
   SelectField,
   SwitchField,
-  Text,
+  TextAreaField,
   TextField,
-  useTheme,
 } from "@aws-amplify/ui-react";
-import {
-  getOverrideProps,
-  useDataStoreBinding,
-} from "@aws-amplify/ui-react/internal";
-import { Checkout, Molecule } from "../models";
+import { getOverrideProps } from "@aws-amplify/ui-react/internal";
+import { Checkout } from "../models";
 import { fetchByPath, validateField } from "./utils";
 import { DataStore } from "aws-amplify";
-function ArrayField({
-  items = [],
-  onChange,
-  label,
-  inputFieldRef,
-  children,
-  hasError,
-  setFieldValue,
-  currentFieldValue,
-  defaultFieldValue,
-  lengthLimit,
-  getBadgeText,
-  errorMessage,
-}) {
-  const labelElement = <Text>{label}</Text>;
-  const {
-    tokens: {
-      components: {
-        fieldmessages: { error: errorStyles },
-      },
-    },
-  } = useTheme();
-  const [selectedBadgeIndex, setSelectedBadgeIndex] = React.useState();
-  const [isEditing, setIsEditing] = React.useState();
-  React.useEffect(() => {
-    if (isEditing) {
-      inputFieldRef?.current?.focus();
-    }
-  }, [isEditing]);
-  const removeItem = async (removeIndex) => {
-    const newItems = items.filter((value, index) => index !== removeIndex);
-    await onChange(newItems);
-    setSelectedBadgeIndex(undefined);
-  };
-  const addItem = async () => {
-    if (
-      currentFieldValue !== undefined &&
-      currentFieldValue !== null &&
-      currentFieldValue !== "" &&
-      !hasError
-    ) {
-      const newItems = [...items];
-      if (selectedBadgeIndex !== undefined) {
-        newItems[selectedBadgeIndex] = currentFieldValue;
-        setSelectedBadgeIndex(undefined);
-      } else {
-        newItems.push(currentFieldValue);
-      }
-      await onChange(newItems);
-      setIsEditing(false);
-    }
-  };
-  const arraySection = (
-    <React.Fragment>
-      {!!items?.length && (
-        <ScrollView height="inherit" width="inherit" maxHeight={"7rem"}>
-          {items.map((value, index) => {
-            return (
-              <Badge
-                key={index}
-                style={{
-                  cursor: "pointer",
-                  alignItems: "center",
-                  marginRight: 3,
-                  marginTop: 3,
-                  backgroundColor:
-                    index === selectedBadgeIndex ? "#B8CEF9" : "",
-                }}
-                onClick={() => {
-                  setSelectedBadgeIndex(index);
-                  setFieldValue(items[index]);
-                  setIsEditing(true);
-                }}
-              >
-                {getBadgeText ? getBadgeText(value) : value.toString()}
-                <Icon
-                  style={{
-                    cursor: "pointer",
-                    paddingLeft: 3,
-                    width: 20,
-                    height: 20,
-                  }}
-                  viewBox={{ width: 20, height: 20 }}
-                  paths={[
-                    {
-                      d: "M10 10l5.09-5.09L10 10l5.09 5.09L10 10zm0 0L4.91 4.91 10 10l-5.09 5.09L10 10z",
-                      stroke: "black",
-                    },
-                  ]}
-                  ariaLabel="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    removeItem(index);
-                  }}
-                />
-              </Badge>
-            );
-          })}
-        </ScrollView>
-      )}
-      <Divider orientation="horizontal" marginTop={5} />
-    </React.Fragment>
-  );
-  if (lengthLimit !== undefined && items.length >= lengthLimit && !isEditing) {
-    return (
-      <React.Fragment>
-        {labelElement}
-        {arraySection}
-      </React.Fragment>
-    );
-  }
-  return (
-    <React.Fragment>
-      {labelElement}
-      {isEditing && children}
-      {!isEditing ? (
-        <>
-          <Button
-            onClick={() => {
-              setIsEditing(true);
-            }}
-          >
-            Add item
-          </Button>
-          {errorMessage && hasError && (
-            <Text color={errorStyles.color} fontSize={errorStyles.fontSize}>
-              {errorMessage}
-            </Text>
-          )}
-        </>
-      ) : (
-        <Flex justifyContent="flex-end">
-          {(currentFieldValue || isEditing) && (
-            <Button
-              children="Cancel"
-              type="button"
-              size="small"
-              onClick={() => {
-                setFieldValue(defaultFieldValue);
-                setIsEditing(false);
-                setSelectedBadgeIndex(undefined);
-              }}
-            ></Button>
-          )}
-          <Button
-            size="small"
-            variation="link"
-            isDisabled={hasError}
-            onClick={addItem}
-          >
-            {selectedBadgeIndex !== undefined ? "Save" : "Add"}
-          </Button>
-        </Flex>
-      )}
-      {arraySection}
-    </React.Fragment>
-  );
-}
 export default function CheckoutCreateForm(props) {
   const {
     clearOnSuccess = true,
@@ -203,9 +36,8 @@ export default function CheckoutCreateForm(props) {
     firstName: "",
     lastName: "",
     researchOrg: "",
+    Field0: "",
     emailAddress: "",
-    items: [],
-    MoleculesInCheckout: [],
   };
   const [paymentMethod, setPaymentMethod] = React.useState(
     initialValues.paymentMethod
@@ -216,12 +48,9 @@ export default function CheckoutCreateForm(props) {
   const [researchOrg, setResearchOrg] = React.useState(
     initialValues.researchOrg
   );
+  const [Field0, setField0] = React.useState(initialValues.Field0);
   const [emailAddress, setEmailAddress] = React.useState(
     initialValues.emailAddress
-  );
-  const [items, setItems] = React.useState(initialValues.items);
-  const [MoleculesInCheckout, setMoleculesInCheckout] = React.useState(
-    initialValues.MoleculesInCheckout
   );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
@@ -230,49 +59,30 @@ export default function CheckoutCreateForm(props) {
     setFirstName(initialValues.firstName);
     setLastName(initialValues.lastName);
     setResearchOrg(initialValues.researchOrg);
+    setField0(initialValues.Field0);
     setEmailAddress(initialValues.emailAddress);
-    setItems(initialValues.items);
-    setCurrentItemsValue("");
-    setMoleculesInCheckout(initialValues.MoleculesInCheckout);
-    setCurrentMoleculesInCheckoutValue(undefined);
-    setCurrentMoleculesInCheckoutDisplayValue("");
     setErrors({});
-  };
-  const [currentItemsValue, setCurrentItemsValue] = React.useState("");
-  const itemsRef = React.createRef();
-  const [
-    currentMoleculesInCheckoutDisplayValue,
-    setCurrentMoleculesInCheckoutDisplayValue,
-  ] = React.useState("");
-  const [currentMoleculesInCheckoutValue, setCurrentMoleculesInCheckoutValue] =
-    React.useState(undefined);
-  const MoleculesInCheckoutRef = React.createRef();
-  const getIDValue = {
-    MoleculesInCheckout: (r) => JSON.stringify({ id: r?.id }),
-  };
-  const MoleculesInCheckoutIdSet = new Set(
-    Array.isArray(MoleculesInCheckout)
-      ? MoleculesInCheckout.map((r) => getIDValue.MoleculesInCheckout?.(r))
-      : getIDValue.MoleculesInCheckout?.(MoleculesInCheckout)
-  );
-  const moleculeRecords = useDataStoreBinding({
-    type: "collection",
-    model: Molecule,
-  }).items;
-  const getDisplayValue = {
-    MoleculesInCheckout: (r) => `${r?.molName}${r?.molSMILES}`,
   };
   const validations = {
     paymentMethod: [],
     agreeToTOS: [],
-    firstName: [],
-    lastName: [],
+    firstName: [{ type: "Required" }],
+    lastName: [{ type: "Required" }],
     researchOrg: [],
-    emailAddress: [{ type: "Email" }],
-    items: [{ type: "Required" }],
-    MoleculesInCheckout: [
-      { type: "Required", validationMessage: "Molecule is required." },
+    Field0: [
+      { type: "Required" },
+      {
+        type: "GreaterThanChar",
+        numValues: [100],
+        validationMessage: "The value must be at least 100 characters",
+      },
+      {
+        type: "LessThanChar",
+        numValues: [750],
+        validationMessage: "The value must be 750 characters or fewer",
+      },
     ],
+    emailAddress: [{ type: "Required" }, { type: "Email" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -305,30 +115,21 @@ export default function CheckoutCreateForm(props) {
           firstName,
           lastName,
           researchOrg,
+          Field0,
           emailAddress,
-          items,
-          MoleculesInCheckout,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
             if (Array.isArray(modelFields[fieldName])) {
               promises.push(
                 ...modelFields[fieldName].map((item) =>
-                  runValidationTasks(
-                    fieldName,
-                    item,
-                    getDisplayValue[fieldName]
-                  )
+                  runValidationTasks(fieldName, item)
                 )
               );
               return promises;
             }
             promises.push(
-              runValidationTasks(
-                fieldName,
-                modelFields[fieldName],
-                getDisplayValue[fieldName]
-              )
+              runValidationTasks(fieldName, modelFields[fieldName])
             );
             return promises;
           }, [])
@@ -352,25 +153,8 @@ export default function CheckoutCreateForm(props) {
             lastName: modelFields.lastName,
             researchOrg: modelFields.researchOrg,
             emailAddress: modelFields.emailAddress,
-            items: modelFields.items,
           };
-          const checkout = await DataStore.save(
-            new Checkout(modelFieldsToSave)
-          );
-          const promises = [];
-          promises.push(
-            ...MoleculesInCheckout.reduce((promises, original) => {
-              promises.push(
-                DataStore.save(
-                  Molecule.copyOf(original, (updated) => {
-                    updated.checkoutID = checkout.id;
-                  })
-                )
-              );
-              return promises;
-            }, [])
-          );
-          await Promise.all(promises);
+          await DataStore.save(new Checkout(modelFieldsToSave));
           if (onSuccess) {
             onSuccess(modelFields);
           }
@@ -387,7 +171,15 @@ export default function CheckoutCreateForm(props) {
       {...rest}
     >
       <SelectField
-        label="How would you like to pay for this order?"
+        label={
+          <span style={{ display: "inline-flex" }}>
+            <span>How would you like to pay for this order?</span>
+            <span style={{ whiteSpace: "pre", fontStyle: "italic" }}>
+              {" "}
+              - optional
+            </span>
+          </span>
+        }
         descriptiveText="Cryptocurrency orders will be given a 10% discount applied automatically. If using e-transfer, please send according to the instructions "
         placeholder="Select payment method...."
         isDisabled={false}
@@ -401,9 +193,8 @@ export default function CheckoutCreateForm(props) {
               firstName,
               lastName,
               researchOrg,
+              Field0,
               emailAddress,
-              items,
-              MoleculesInCheckout,
             };
             const result = onChange(modelFields);
             value = result?.paymentMethod ?? value;
@@ -435,7 +226,18 @@ export default function CheckoutCreateForm(props) {
         ></option>
       </SelectField>
       <SwitchField
-        label="I agree to the terms of service of RCSrc Canada by placing this order"
+        label={
+          <span style={{ display: "inline-flex" }}>
+            <span>
+              I agree to the terms of service of RCSrc Canada by placing this
+              order
+            </span>
+            <span style={{ whiteSpace: "pre", fontStyle: "italic" }}>
+              {" "}
+              - optional
+            </span>
+          </span>
+        }
         defaultChecked={false}
         isDisabled={false}
         isChecked={agreeToTOS}
@@ -448,9 +250,8 @@ export default function CheckoutCreateForm(props) {
               firstName,
               lastName,
               researchOrg,
+              Field0,
               emailAddress,
-              items,
-              MoleculesInCheckout,
             };
             const result = onChange(modelFields);
             value = result?.agreeToTOS ?? value;
@@ -467,7 +268,7 @@ export default function CheckoutCreateForm(props) {
       ></SwitchField>
       <TextField
         label="First name"
-        isRequired={false}
+        isRequired={true}
         isReadOnly={false}
         value={firstName}
         onChange={(e) => {
@@ -479,9 +280,8 @@ export default function CheckoutCreateForm(props) {
               firstName: value,
               lastName,
               researchOrg,
+              Field0,
               emailAddress,
-              items,
-              MoleculesInCheckout,
             };
             const result = onChange(modelFields);
             value = result?.firstName ?? value;
@@ -498,7 +298,7 @@ export default function CheckoutCreateForm(props) {
       ></TextField>
       <TextField
         label="Last name"
-        isRequired={false}
+        isRequired={true}
         isReadOnly={false}
         value={lastName}
         onChange={(e) => {
@@ -510,9 +310,8 @@ export default function CheckoutCreateForm(props) {
               firstName,
               lastName: value,
               researchOrg,
+              Field0,
               emailAddress,
-              items,
-              MoleculesInCheckout,
             };
             const result = onChange(modelFields);
             value = result?.lastName ?? value;
@@ -528,7 +327,15 @@ export default function CheckoutCreateForm(props) {
         {...getOverrideProps(overrides, "lastName")}
       ></TextField>
       <TextField
-        label="Research Organization"
+        label={
+          <span style={{ display: "inline-flex" }}>
+            <span>Research Organization</span>
+            <span style={{ whiteSpace: "pre", fontStyle: "italic" }}>
+              {" "}
+              - optional
+            </span>
+          </span>
+        }
         descriptiveText="If you are affiliated with a public or industry research organization, please give us the official company name as registered. ( optional if research use is specified )"
         isRequired={false}
         isReadOnly={false}
@@ -542,9 +349,8 @@ export default function CheckoutCreateForm(props) {
               firstName,
               lastName,
               researchOrg: value,
+              Field0,
               emailAddress,
-              items,
-              MoleculesInCheckout,
             };
             const result = onChange(modelFields);
             value = result?.researchOrg ?? value;
@@ -559,9 +365,38 @@ export default function CheckoutCreateForm(props) {
         hasError={errors.researchOrg?.hasError}
         {...getOverrideProps(overrides, "researchOrg")}
       ></TextField>
+      <TextAreaField
+        label="Research Intent"
+        descriptiveText="Please state your general research intent and methodology with the compounds sold by RCSrc Canada to you, the customer, in this order; including safety precautions taken, PPE and other safety equipment utilized i.e fume hood. Examples of common uses include as reference material for synthesis verification, forensic reference sample, in vitro bioassays and receptor binding studies, etc."
+        isRequired={true}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              paymentMethod,
+              agreeToTOS,
+              firstName,
+              lastName,
+              researchOrg,
+              Field0: value,
+              emailAddress,
+            };
+            const result = onChange(modelFields);
+            value = result?.Field0 ?? value;
+          }
+          if (errors.Field0?.hasError) {
+            runValidationTasks("Field0", value);
+          }
+          setField0(value);
+        }}
+        onBlur={() => runValidationTasks("Field0", Field0)}
+        errorMessage={errors.Field0?.errorMessage}
+        hasError={errors.Field0?.hasError}
+        {...getOverrideProps(overrides, "Field0")}
+      ></TextAreaField>
       <TextField
         label="Email address"
-        isRequired={false}
+        isRequired={true}
         isReadOnly={false}
         value={emailAddress}
         onChange={(e) => {
@@ -573,9 +408,8 @@ export default function CheckoutCreateForm(props) {
               firstName,
               lastName,
               researchOrg,
+              Field0,
               emailAddress: value,
-              items,
-              MoleculesInCheckout,
             };
             const result = onChange(modelFields);
             value = result?.emailAddress ?? value;
@@ -590,143 +424,6 @@ export default function CheckoutCreateForm(props) {
         hasError={errors.emailAddress?.hasError}
         {...getOverrideProps(overrides, "emailAddress")}
       ></TextField>
-      <ArrayField
-        onChange={async (items) => {
-          let values = items;
-          if (onChange) {
-            const modelFields = {
-              paymentMethod,
-              agreeToTOS,
-              firstName,
-              lastName,
-              researchOrg,
-              emailAddress,
-              items: values,
-              MoleculesInCheckout,
-            };
-            const result = onChange(modelFields);
-            values = result?.items ?? values;
-          }
-          setItems(values);
-          setCurrentItemsValue("");
-        }}
-        currentFieldValue={currentItemsValue}
-        label={"Items"}
-        items={items}
-        hasError={errors?.items?.hasError}
-        errorMessage={errors?.items?.errorMessage}
-        setFieldValue={setCurrentItemsValue}
-        inputFieldRef={itemsRef}
-        defaultFieldValue={""}
-      >
-        <TextField
-          label="Items"
-          isRequired={true}
-          isReadOnly={false}
-          value={currentItemsValue}
-          onChange={(e) => {
-            let { value } = e.target;
-            if (errors.items?.hasError) {
-              runValidationTasks("items", value);
-            }
-            setCurrentItemsValue(value);
-          }}
-          onBlur={() => runValidationTasks("items", currentItemsValue)}
-          errorMessage={errors.items?.errorMessage}
-          hasError={errors.items?.hasError}
-          ref={itemsRef}
-          labelHidden={true}
-          {...getOverrideProps(overrides, "items")}
-        ></TextField>
-      </ArrayField>
-      <ArrayField
-        onChange={async (items) => {
-          let values = items;
-          if (onChange) {
-            const modelFields = {
-              paymentMethod,
-              agreeToTOS,
-              firstName,
-              lastName,
-              researchOrg,
-              emailAddress,
-              items,
-              MoleculesInCheckout: values,
-            };
-            const result = onChange(modelFields);
-            values = result?.MoleculesInCheckout ?? values;
-          }
-          setMoleculesInCheckout(values);
-          setCurrentMoleculesInCheckoutValue(undefined);
-          setCurrentMoleculesInCheckoutDisplayValue("");
-        }}
-        currentFieldValue={currentMoleculesInCheckoutValue}
-        label={"Molecules in checkout"}
-        items={MoleculesInCheckout}
-        hasError={errors?.MoleculesInCheckout?.hasError}
-        errorMessage={errors?.MoleculesInCheckout?.errorMessage}
-        getBadgeText={getDisplayValue.MoleculesInCheckout}
-        setFieldValue={(model) => {
-          setCurrentMoleculesInCheckoutDisplayValue(
-            model ? getDisplayValue.MoleculesInCheckout(model) : ""
-          );
-          setCurrentMoleculesInCheckoutValue(model);
-        }}
-        inputFieldRef={MoleculesInCheckoutRef}
-        defaultFieldValue={""}
-      >
-        <Autocomplete
-          label="Molecules in checkout"
-          isRequired={true}
-          isReadOnly={false}
-          placeholder="Search Molecule"
-          value={currentMoleculesInCheckoutDisplayValue}
-          options={moleculeRecords
-            .filter(
-              (r) =>
-                !MoleculesInCheckoutIdSet.has(
-                  getIDValue.MoleculesInCheckout?.(r)
-                )
-            )
-            .map((r) => ({
-              id: getIDValue.MoleculesInCheckout?.(r),
-              label: getDisplayValue.MoleculesInCheckout?.(r),
-            }))}
-          onSelect={({ id, label }) => {
-            setCurrentMoleculesInCheckoutValue(
-              moleculeRecords.find((r) =>
-                Object.entries(JSON.parse(id)).every(
-                  ([key, value]) => r[key] === value
-                )
-              )
-            );
-            setCurrentMoleculesInCheckoutDisplayValue(label);
-            runValidationTasks("MoleculesInCheckout", label);
-          }}
-          onClear={() => {
-            setCurrentMoleculesInCheckoutDisplayValue("");
-          }}
-          onChange={(e) => {
-            let { value } = e.target;
-            if (errors.MoleculesInCheckout?.hasError) {
-              runValidationTasks("MoleculesInCheckout", value);
-            }
-            setCurrentMoleculesInCheckoutDisplayValue(value);
-            setCurrentMoleculesInCheckoutValue(undefined);
-          }}
-          onBlur={() =>
-            runValidationTasks(
-              "MoleculesInCheckout",
-              currentMoleculesInCheckoutDisplayValue
-            )
-          }
-          errorMessage={errors.MoleculesInCheckout?.errorMessage}
-          hasError={errors.MoleculesInCheckout?.hasError}
-          ref={MoleculesInCheckoutRef}
-          labelHidden={true}
-          {...getOverrideProps(overrides, "MoleculesInCheckout")}
-        ></Autocomplete>
-      </ArrayField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

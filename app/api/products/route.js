@@ -1,35 +1,40 @@
 import { stdout } from "process";
-import { getMongoClient } from "../../@utils/db";
+import { getMongoClient } from "../../_utils/db";
 import { NextResponse } from "next/server";
 
 export const GET = async (request, context) => {
-
-    const db = await getMongoClient(); 
-    const products = db.db('data').collection('products');
-
-    const filter = {};
-
-    const query = products.find(filter);
     
+    const client = await getMongoClient(); 
+    const products = client.db('data').collection('products');
+
     try {
 
-        const res = await query.toArray();
-        stdout.write(`/api/products/ returned ${query}\n`);
+        const filter = {};
+
+        const limit = request.nextUrl.searchParams.get('limit') 
+                        ? _.toSafeInteger(request.nextUrl.searchParams.get('limit')[0])
+                        : 0;
     
+        const query = products.find(filter, { limit: limit });
+
+        const res = await query.toArray();
+
         return NextResponse.json({
             success: true,
             message: `/api/products/ found ${res.length} products`,
             data: res,
-        }, { status: 200 });
+        }, { status: 200 });    
 
-    } catch {(err) => {
+    } catch(err) {
+
         console.log(err);
+
         return NextResponse.json({
             success: false,
-            message: `/api/products/ errored`,
+            message: `/api/products/ errored, either the DB connection failed or the query failed!`,
             data: err,
         }, { status: 400 });
-    }}
 
+    }
 
 } 

@@ -2,44 +2,139 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import { Auth } from 'aws-amplify';
-import awsExports from '../aws-exports';
-import { Amplify } from 'aws-amplify';
+import { useRouter } from 'next/navigation';
+import { mapKeys } from 'lodash';
+import { Hub } from '@aws-amplify/core';
 
-Amplify.configure({ ...awsExports, ssr: true });
+export const useUserInfo = () => {
 
-const useUserInfo = () => {
+    const { route, user, signOut } = useAuthenticator(context => [context.route, context.user, context.isPending])
+    const [authedUser, setAuthedUser] = useState({});
+    const [latestAuthEvent, setLatestAuthEvent] = useState(null);
 
-    const { route, user, signOut } = useAuthenticator((context) => [context.user])
-    const [ authedUser, setAuthedUser ] = useState({});
+    const router = useRouter();
+
+    Hub.listen('auth', (data) => {
+        
+        switch (data.payload.event) {
+        
+            case 'signIn':
+        
+                router.push('/account');
+                
+                setLatestAuthEvent({
+                    type: 'signIn',
+                    event: data.payload.event
+                });
+                break;
+            
+            case 'signUp':
+
+                router.push('/account/login')    
+                
+                setLatestAuthEvent({
+                    type: 'signUp',
+                    event: data.payload.event
+                });
+                break;
+            
+            case 'signOut':
+
+                router.push('/')
+                
+                setLatestAuthEvent({
+                    type: 'signOut',
+                    event: data.payload.event
+                });
+                break;
+
+            case 'signIn_failure':
+
+                setLatestAuthEvent({
+                    type: 'signIn_failure',
+                    event: data.payload.event
+                });
+                break;
+
+            case 'configured':
+                setLatestAuthEvent({
+                    type: 'auth_configured',
+                    event: data.payload.event
+                });
+                break;
+            
+            default:
+                setLatestAuthEvent({
+                    type: 'unknown',
+                    event: data.payload.event
+                });
+                break;
+                
+        }
+
+        console.log(latestAuthEvent);
+
+    });
 
     useEffect(() => {
 
-        // i.e user is authenticated
-        if (route === 'authenticated') {
+        console.log(`route: ${route} ( useUserInfo() )`);
+
+        if (route == 'authenticated') {
+
+            // clean up the user object and add some additional properties
+            // including the cartStore object, and the 'isAuthenticated' property
+
+            const newUserObj = {
+                ...user.signInUserSession.idToken.payload,
+                username: user.signInUserSession.idToken.payload["cognito:username"],
+                currentStatus: route,
+                //cartStore: JSON.parse(user.pool.storage.store.cartStore),
+                storage: { ...user.pool.storage.store }
+            }
+
+            // Remove 'cognito:' from the keys using lodash _.mapKeys
+
+            const lessCognitoUserObj = mapKeys(newUserObj, (value, key) => {
+                                            if (key.includes('cognito:')) {
+                                                return key.replace('cognito:', '');
+                                            } else {
+                                                return key;
+                                            }
+                                        });
 
             setAuthedUser({
-                ...user.signInUserSession.idToken.payload,
-                roles: user.signInUserSession.idToken.payload["cognito:groups"],
-                ['cognito:groups']: _,
-                cartStore: JSON.parse(user.pool.storage.store.cartStore),
-                isAuthenticated: true
+                ...lessCognitoUserObj,
+                isAuthenticated: true,
+                loading: false,
+                route: route
             });
 
+        } else if (route == 'idle') {
+        
+            setAuthedUser({ isAuthenticated: undefined, loading: true, route: route })
+
         } else {
-            setAuthedUser({ isAuthenticated: false });
+
+            setAuthedUser({ isAuthenticated: false, loading: false, route: route });
+
         }
 
-        console.log(`authedUser: ${JSON.stringify(authedUser)} (useUserInfo.jsx)`);
+    }, [user, route, latestAuthEvent]);
 
-    }, [user]);
+    const signUserOut = ( pathname = '/' ) => {
+
+        setAuthedUser({ isAuthenticated: false });
+        signOut();
+        
+        router.push(pathname);
+
+    }
         
     return [
         authedUser,
-        setAuthedUser,
-        signOut
+        route,
+        signUserOut,
     ];
     
 }
-
-export default useUserInfo;

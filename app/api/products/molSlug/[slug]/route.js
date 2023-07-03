@@ -1,45 +1,44 @@
 // query: { inStock: { $elemMatch: { $eq: true } } }
 
 import { stdout } from "process";
-import { getMongoClient } from "../../../../@utils/db"
+import { getMongoClient } from "../../../../_utils/db"
+import clientPromise from "../../../../_utils/db";
 import { NextResponse } from "next/server";
 
 export const GET = async (request, context) => {
 
-    let contextParams = context.params.slug;
+    let slug = context.params.slug;
 
-    const db = await getMongoClient(); 
-    const products = db.db('data').collection('products');
+    const client = await clientPromise; 
+    const products = client.db('data').collection('products');
 
     const filter = {
-        'molSlug': {
-            '$eq': contextParams
-        }
+        'molSlug': slug
     };
+    const limit = 1;
 
-    const query = products.find(filter);
+    const query = products.find(filter, { limit });
     
     try {
 
         const res = await query.toArray();
-        stdout.write(`/api/products/molSlug/${contextParams} returned ${query}\n`);
-    
+
         return NextResponse.json({
             success: true,
-            message: `/api/products/molSlug/${contextParams} found ${res.length} products`,
-            data: res,
+            message: `/api/products/molSlug/${slug} found ${res.length} products`,
+            data: res[0],
         }, { status: 200 });
 
-    } catch {(err) => {
+    } catch(err) {
 
         console.log(err);
         
         return NextResponse.json({
             success: false,
-            message: `/api/products/molSlug/${contextParams} errored`,
+            message: `/api/products/molSlug/${slug} errored`,
             data: err,
         }, { status: 400 });
     
-    }}
+    }
 
 } 

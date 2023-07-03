@@ -1,8 +1,16 @@
 const CopyPlugin = require("copy-webpack-plugin");
 
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+	enabled: process.env.ANALYZE === 'true',
+})
+
 /** @type {import('next').NextConfig} */
-module.exports = {
+module.exports = withBundleAnalyzer({
+	reactStrictMode: true,
 	output: 'standalone',
+	devIndicators: {
+		buildActivityPosition: 'bottom-right',
+	},
 	experimental: {
 		appDir: true,
 		serverActions: true,
@@ -17,12 +25,12 @@ module.exports = {
 	images: {
 		remotePatterns: [
 			{
-			protocol: 'https',
-			hostname: 'pubchem.ncbi.nlm.nih.gov',
-			port: '',
-			pathname: '/**',
+				protocol: 'https',
+				hostname: 'pubchem.ncbi.nlm.nih.gov',
+				port: '',
+				pathname: '/**',
 			},
 		],
 	}
 
-}
+})

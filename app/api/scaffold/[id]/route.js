@@ -1,7 +1,7 @@
 // query: { inStock: { $elemMatch: { $eq: true } } }
 
 import { stdout } from "process";
-import { getMongoClient } from "../../../@utils/db";
+import { getMongoClient } from "../../../_utils/db";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 

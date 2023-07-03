@@ -5,9 +5,8 @@
  **************************************************************************/
 
 import * as React from "react";
-import { AutocompleteProps, GridProps, SelectFieldProps, SwitchFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SelectFieldProps, SwitchFieldProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
-import { Molecule } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -19,9 +18,8 @@ export declare type CheckoutCreateFormInputValues = {
     firstName?: string;
     lastName?: string;
     researchOrg?: string;
+    Field0?: string;
     emailAddress?: string;
-    items?: string[];
-    MoleculesInCheckout?: Molecule[];
 };
 export declare type CheckoutCreateFormValidationValues = {
     paymentMethod?: ValidationFunction<string>;
@@ -29,9 +27,8 @@ export declare type CheckoutCreateFormValidationValues = {
     firstName?: ValidationFunction<string>;
     lastName?: ValidationFunction<string>;
     researchOrg?: ValidationFunction<string>;
+    Field0?: ValidationFunction<string>;
     emailAddress?: ValidationFunction<string>;
-    items?: ValidationFunction<string>;
-    MoleculesInCheckout?: ValidationFunction<Molecule>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type CheckoutCreateFormOverridesProps = {
@@ -41,9 +38,8 @@ export declare type CheckoutCreateFormOverridesProps = {
     firstName?: PrimitiveOverrideProps<TextFieldProps>;
     lastName?: PrimitiveOverrideProps<TextFieldProps>;
     researchOrg?: PrimitiveOverrideProps<TextFieldProps>;
+    Field0?: PrimitiveOverrideProps<TextAreaFieldProps>;
     emailAddress?: PrimitiveOverrideProps<TextFieldProps>;
-    items?: PrimitiveOverrideProps<TextFieldProps>;
-    MoleculesInCheckout?: PrimitiveOverrideProps<AutocompleteProps>;
 } & EscapeHatchProps;
 export declare type CheckoutCreateFormProps = React.PropsWithChildren<{
     overrides?: CheckoutCreateFormOverridesProps | undefined | null;

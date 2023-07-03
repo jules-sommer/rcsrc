@@ -1,5 +1,27 @@
 {
   "api": {
+    "AdminQueries": {
+      "authorizationType": "AMAZON_COGNITO_USER_POOLS",
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "rcsrccanada"
+        },
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "AdminQueries2fcee30c"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
     "rcsrccanada": {
       "dependsOn": [],
       "output": {
@@ -25,7 +47,53 @@
   "auth": {
     "rcsrccanada": {
       "customAuth": false,
-      "dependsOn": [],
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "rcsrccanadaDefineAuthChallenge",
+          "triggerProvider": "Cognito"
+        },
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "rcsrccanadaCreateAuthChallenge",
+          "triggerProvider": "Cognito"
+        },
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "rcsrccanadaVerifyAuthChallengeResponse",
+          "triggerProvider": "Cognito"
+        },
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "rcsrccanadaCustomMessage",
+          "triggerProvider": "Cognito"
+        },
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "rcsrccanadaPostConfirmation",
+          "triggerProvider": "Cognito"
+        }
+      ],
       "frontendAuthConfig": {
         "mfaConfiguration": "OPTIONAL",
         "mfaTypes": [
@@ -59,9 +127,202 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
+    },
+    "userPoolGroups": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "rcsrccanada"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito-UserPool-Groups"
+    }
+  },
+  "function": {
+    "AdminQueries2fcee30c": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "rcsrccanada"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "rcsrccanadaCreateAuthChallenge": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "rcsrccanadaCustomMessage": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "rcsrccanadaDefineAuthChallenge": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "rcsrccanadaPostConfirmation": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "rcsrccanadaVerifyAuthChallengeResponse": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "parameters": {
+    "AMPLIFY_function_AdminQueries2fcee30c_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "AdminQueries2fcee30c"
+        }
+      ]
+    },
+    "AMPLIFY_function_AdminQueries2fcee30c_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "AdminQueries2fcee30c"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaCreateAuthChallenge_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaCreateAuthChallenge"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaCreateAuthChallenge_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaCreateAuthChallenge"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaCustomMessage_EMAILMESSAGE": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaCustomMessage"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaCustomMessage_EMAILSUBJECT": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaCustomMessage"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaCustomMessage_REDIRECTURL": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaCustomMessage"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaCustomMessage_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaCustomMessage"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaCustomMessage_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaCustomMessage"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaDefineAuthChallenge_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaDefineAuthChallenge"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaDefineAuthChallenge_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaDefineAuthChallenge"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaPostConfirmation_GROUP": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaPostConfirmation_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaPostConfirmation_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaVerifyAuthChallengeResponse_RECAPTCHASECRET": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaVerifyAuthChallengeResponse"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaVerifyAuthChallengeResponse_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaVerifyAuthChallengeResponse"
+        }
+      ]
+    },
+    "AMPLIFY_function_rcsrccanadaVerifyAuthChallengeResponse_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "rcsrccanadaVerifyAuthChallengeResponse"
+        }
+      ]
+    },
     "AMPLIFY_function_test_deploymentBucketName": {
       "usedBy": [
         {
@@ -77,13 +338,6 @@
           "resourceName": "test"
         }
       ]
-    }
-  },
-  "storage": {
-    "content": {
-      "dependsOn": [],
-      "providerPlugin": "awscloudformation",
-      "service": "S3"
     }
   }
 }

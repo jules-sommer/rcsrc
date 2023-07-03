@@ -1230,15 +1230,6 @@ export default createTheme({
       },
       brand: {
         primary: {
-          10: { value: "hsl(202, 25%, 62%)" },
-          20: { value: "hsl(202, 25%, 54%)" },
-          40: { value: "hsl(202, 39%, 39%)" },
-          60: { value: "hsl(202, 80%, 24%)" },
-          80: { value: "hsl(202, 80%, 19%)" },
-          90: { value: "hsl(202, 81%, 14%)" },
-          100: { value: "hsl(202, 80%, 12%)" },
-        },
-        secondary: {
           10: { value: "{colors.purple.10.value}" },
           20: { value: "{colors.purple.20.value}" },
           40: { value: "{colors.purple.40.value}" },
@@ -1247,10 +1238,19 @@ export default createTheme({
           90: { value: "{colors.purple.90.value}" },
           100: { value: "{colors.purple.100.value}" },
         },
+        secondary: {
+          10: { value: "{colors.teal.10.value}" },
+          20: { value: "{colors.teal.20.value}" },
+          40: { value: "{colors.teal.40.value}" },
+          60: { value: "{colors.teal.60.value}" },
+          80: { value: "{colors.teal.80.value}" },
+          90: { value: "{colors.teal.90.value}" },
+          100: { value: "{colors.teal.100.value}" },
+        },
       },
       font: {
-        primary: { value: "{colors.neutral.100.value}" },
-        secondary: { value: "{colors.neutral.90.value}" },
+        primary: { value: "{colors.neutral.20.value}" },
+        secondary: { value: "{colors.neutral.40.value}" },
         tertiary: { value: "{colors.neutral.80.value}" },
         disabled: { value: "{colors.font.tertiary.value}" },
         inverse: { value: "{colors.white.value}" },
@@ -1264,7 +1264,7 @@ export default createTheme({
         success: { value: "{colors.green.90.value}" },
       },
       background: {
-        primary: { value: "{colors.white.value}" },
+        primary: { value: "hsl(300, 100%, 15%)" },
         secondary: { value: "{colors.neutral.10.value}" },
         tertiary: { value: "{colors.neutral.20.value}" },
         disabled: { value: "{colors.background.tertiary.value}" },

@@ -28,6 +28,7 @@ module.exports = {
 		'next',
 		'next/core-web-vitals',
 		'airbnb',
+		'plugin:prettier/recommended'
 
 	],
 

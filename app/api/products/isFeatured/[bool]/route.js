@@ -1,7 +1,7 @@
 // query: { inStock: { $elemMatch: { $eq: true } } }
 
 import { stdout } from "process";
-import { getMongoClient } from "../../../../@utils/db"
+import { getMongoClient } from "../../../../_utils/db"
 import { NextResponse } from "next/server";
 import _ from "lodash";
 
@@ -49,7 +49,7 @@ export const GET = async (request, context) => {
             data: res,
         }, { status: 200 });
 
-    } catch {(err) => {
+    } catch(err) {
 
         console.log(err);
         return NextResponse.json({
@@ -58,6 +58,6 @@ export const GET = async (request, context) => {
             data: err,
         }, { status: 400 });
 
-    }}
+    }
 
 } 

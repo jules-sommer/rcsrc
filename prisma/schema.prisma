@@ -1,0 +1,51 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+generator docs {
+  provider = "node node_modules/prisma-docs-generator"
+  output   = "../_docs"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model ProductInventory {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerProduct   Product? @relation()
+  ownerProductId String   @unique @db.ObjectId
+  unit           String   @default("g")
+  quantity       Int
+}
+
+model Scaffold {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  name        String
+  iupac       String
+  SMILES      String
+  products    Product[]
+  productsIds String[]
+}
+
+model Product {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  name        String
+  CAS         String
+  iupac       String
+  inStock     ProductInventory @relation(fields: [inStockId], references: [id])
+  inStockId   String           @unique @db.ObjectId
+  scaffold    Scaffold         @relation(fields: [scaffoldId], references: [id])
+  scaffoldId  String           @db.ObjectId
+  quantity    Int
+  unit        String
+  SMILES      String
+  description String
+  tags        String[]
+}

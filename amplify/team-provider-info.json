@@ -20,6 +20,35 @@
         "test": {
           "deploymentBucketName": "amplify-amplify994803aad46f4-staging-153924-deployment",
           "s3Key": "amplify-builds/test-38565139476277386649-build.zip"
+        },
+        "rcsrccanadaDefineAuthChallenge": {
+          "deploymentBucketName": "amplify-amplify994803aad46f4-staging-153924-deployment",
+          "s3Key": "amplify-builds/rcsrccanadaDefineAuthChallenge-67546b307a424c315647-build.zip"
+        },
+        "rcsrccanadaCreateAuthChallenge": {
+          "deploymentBucketName": "amplify-amplify994803aad46f4-staging-153924-deployment",
+          "s3Key": "amplify-builds/rcsrccanadaCreateAuthChallenge-453369646e5851726352-build.zip"
+        },
+        "rcsrccanadaVerifyAuthChallengeResponse": {
+          "RECAPTCHASECRET": "6Lc-fcomAAAAAIDVWJqEgfEGXxrVZK27k0EI4Bu2 ",
+          "deploymentBucketName": "amplify-amplify994803aad46f4-staging-153924-deployment",
+          "s3Key": "amplify-builds/rcsrccanadaVerifyAuthChallengeResponse-4b513438664734464b48-build.zip"
+        },
+        "rcsrccanadaCustomMessage": {
+          "REDIRECTURL": "http://localhost:3000/account",
+          "EMAILSUBJECT": "This is custom account verification email, I think?",
+          "EMAILMESSAGE": "I am a bad programmer, but here is a link that might verify your account:",
+          "deploymentBucketName": "amplify-amplify994803aad46f4-staging-153924-deployment",
+          "s3Key": "amplify-builds/rcsrccanadaCustomMessage-77396c66634c712f3158-build.zip"
+        },
+        "rcsrccanadaPostConfirmation": {
+          "GROUP": "Customer",
+          "deploymentBucketName": "amplify-amplify994803aad46f4-staging-153924-deployment",
+          "s3Key": "amplify-builds/rcsrccanadaPostConfirmation-73767556512f41784847-build.zip"
+        },
+        "AdminQueries2fcee30c": {
+          "deploymentBucketName": "amplify-amplify994803aad46f4-staging-153924-deployment",
+          "s3Key": "amplify-builds/AdminQueries2fcee30c-74766d476d4a2f725558-build.zip"
         }
       }
     }
