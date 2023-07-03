@@ -39,6 +39,7 @@
     "next-auth": "^4.22.1",
     "next-connect": "^1.0.0-next.4",
     "next-sanity": "^4.3.3",
+    "nodemailer": "^6.9.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.45.1",
