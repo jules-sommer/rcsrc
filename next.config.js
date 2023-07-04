@@ -34,6 +34,7 @@ module.exports = withBundleAnalyzer({
 	compiler: {
 
 		
+		
 	},
 
 	images: {

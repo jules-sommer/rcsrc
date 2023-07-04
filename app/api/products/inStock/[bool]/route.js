@@ -12,7 +12,6 @@ export const GET = async (request, context) => {
     const client = await clientPromise;
     const products = client.db('data').collection('products');
 
-
     let filter;
 
     if( isInStock === true ) {
