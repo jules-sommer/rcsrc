@@ -4,77 +4,37 @@ import { useState, useMemo, useEffect } from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { useRouter } from 'next/navigation';
 import { mapKeys } from 'lodash';
-import { Hub } from '@aws-amplify/core';
+import { Hub, Auth } from '@aws-amplify/core';
+
+import { signUserOut, logUserIn } from '../_slices/_auth';
+import { useDispatch, useSelector } from 'react-redux';
 
 export const useUserInfo = () => {
 
-    const { route, user, signOut } = useAuthenticator(context => [context.route, context.user, context.isPending])
+    const { route, user, signOut } = useAuthenticator(context => [context.user, context.signOut, context.route])
+    const authState = useSelector((state) => state.authReducer.value);
+
     const [authedUser, setAuthedUser] = useState({});
-    const [latestAuthEvent, setLatestAuthEvent] = useState(null);
 
     const router = useRouter();
+    const dispatch = useDispatch();
 
-    Hub.listen('auth', (data) => {
-        
-        switch (data.payload.event) {
-        
-            case 'signIn':
-        
-                router.push('/account').reload();
-                
-                setLatestAuthEvent({
-                    type: 'signIn',
-                    event: data.payload.event
-                });
-                break;
-            
-            case 'signUp':
+    const signUserOut = ( pathname = '/' ) => {
 
-                router.push('/account/login')    
-                
-                setLatestAuthEvent({
-                    type: 'signUp',
-                    event: data.payload.event
-                });
-                break;
-            
-            case 'signOut':
+        try {
 
-                router.push('/')
-                
-                setLatestAuthEvent({
-                    type: 'signOut',
-                    event: data.payload.event
-                });
-                break;
+            signOut();
+            dispatch(signUserOut());
 
-            case 'signIn_failure':
+        } catch (error) {
 
-                setLatestAuthEvent({
-                    type: 'signIn_failure',
-                    event: data.payload.event
-                });
-                break;
+            console.log(error);
 
-            case 'configured':
-                setLatestAuthEvent({
-                    type: 'auth_configured',
-                    event: data.payload.event
-                });
-                break;
-            
-            default:
-                setLatestAuthEvent({
-                    type: 'unknown',
-                    event: data.payload.event
-                });
-                break;
-                
         }
+            
+        router.push(pathname);
 
-        console.log(latestAuthEvent);
-
-    });
+    }
 
     useEffect(() => {
 
@@ -103,6 +63,7 @@ export const useUserInfo = () => {
                                             }
                                         });
 
+
             setAuthedUser({
                 ...lessCognitoUserObj,
                 isAuthenticated: true,
@@ -120,21 +81,13 @@ export const useUserInfo = () => {
 
         }
 
-    }, [user, route, latestAuthEvent]);
+    }, [user, route]);
 
-    const signUserOut = ( pathname = '/' ) => {
-
-        setAuthedUser({ isAuthenticated: false });
-        signOut();
-        
-        router.push(pathname);
-
-    }
-        
     return [
         authedUser,
         route,
         signUserOut,
+        authState
     ];
-    
-}
+
+} 

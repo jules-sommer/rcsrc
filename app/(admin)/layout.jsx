@@ -30,6 +30,7 @@ export default function RootLayout({ children }) {
 			<body>
 				
 				<UseAwsAuth>
+					
 					<ClientProvider>
 
                         <Header
@@ -43,6 +44,7 @@ export default function RootLayout({ children }) {
 						<main className=' bg-slate-950'>{children}</main>
 						
 					</ClientProvider>
+
 				</UseAwsAuth>
 			
 			</body>

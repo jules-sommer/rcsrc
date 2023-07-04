@@ -3,14 +3,34 @@
 import { Heading, Badge, Button, TabItem, Tabs, View } from '@aws-amplify/ui-react';
 import { useUserInfo } from '../../_providers/useUserInfo';
 import { Suspense } from 'react';
+import { Auth } from '@aws-amplify/auth';
 
-const UserAccountSummary = () => {
+const UserAccountSummary = async () => {
 
     const [
         user,
         route,
-        signOut
+        signOut,
+        authState
     ] = useUserInfo();
+
+    const getUserSession = async () => {
+
+        try {
+
+            const session = await Auth.userSession();
+            console.log(session);
+
+            return session;
+
+        } catch (error) {
+
+            console.log(error);
+            return error;
+
+        }
+
+    }
 
     return (
 
@@ -62,6 +82,20 @@ const UserAccountSummary = () => {
                             <Heading level={3} className='font-mono text-slate-900'>user Object AWS:</Heading>
                             <pre className='font-mono text-slate-800 whitespace-pre-wrap font-bold'>{JSON.stringify(user, undefined, 4)}</pre>        
                     
+                        </TabItem>
+
+                        <TabItem title={"Auth State (Temp.)"} className='p-6'>
+
+                            <Heading level={3} className='font-mono text-slate-900'>authState:</Heading>
+                            <pre className='font-mono text-slate-800 whitespace-pre-wrap font-bold'>{JSON.stringify(authState, undefined, 4)}</pre>
+
+                        </TabItem>
+                    
+                        <TabItem title={'User Session'}>
+
+                            <Heading level={3} className='font-mono text-slate-900'>userSession:</Heading>
+                            <pre className='font-mono text-slate-800 whitespace-pre-wrap font-bold'>{JSON.stringify(userSession, undefined, 4)}</pre>
+
                         </TabItem>
 
                     </Tabs>

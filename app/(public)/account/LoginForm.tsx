@@ -7,11 +7,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+import { logUserIn, User } from '../../_slices/_auth';
+import { useDispatch } from 'react-redux';
+
 import { Component, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader } from '@aws-amplify/ui-react';
 import { SecondaryBodyText } from '../../_primitives/Typography';
 import { CognitoUser } from '@aws-amplify/auth';
+import { log } from 'console';
 
 let renderCount = 0;
 
@@ -41,13 +45,46 @@ export const LoginForm = async () => {
         resolver: zodResolver(LoginForm)
     });
     
+    const dispatch = useDispatch();
+
     const submitLoginForm = async (data) => {
 
         console.log(data);
 
         try {
 
-            const request = await Auth.signIn(data.email, data.password);
+            const user = await Auth.signIn(data.email, data.password);
+            const { sub, name, email } = user.attributes;
+
+            const userData = await user.fetchUserData()
+            console.log(`User data:`);
+            console.log(userData);
+
+            if( sub && name && email ) {
+
+                const user = await Auth.currentAuthenticatedUser()
+                                            .then((user) => {
+
+                                                console.log(`current authenticated user:`);
+                                                console.log(user);
+
+                                                const userObject: User = {
+                                                    sub: sub,
+                                                    name: name,
+                                                    email: email,
+                                                    isAuthorized: "authorized",
+                                                };
+                                
+                                                dispatch(logUserIn(userObject));
+                                                
+                                            })
+                                            .catch((err) => {
+
+                                                console.log(err)
+
+                                            });
+
+            }
 
         } catch (error) {
 
@@ -60,7 +97,10 @@ export const LoginForm = async () => {
 
     const router = useRouter();
 
-    const { route, user, signOut } = useAuthenticator(context => [context.route, context.user, context.isPending])
+    const { route, user, signOut, isPending } = useAuthenticator(context => [context.route, context.user, context.isPending])
+
+    console.log(`route: ${route}`);
+    console.log(`isPending: ${JSON.stringify(isPending)}`);
 
     if (route === 'idle')
         return <Loader size="large" />;
@@ -126,7 +166,7 @@ export const LoginForm = async () => {
 
                 <div>
 
-                    <p className='text-sm font-mono text-red-700'>{JSON.stringify(errors.email?.message)}</p>
+                    <p className='text-sm font-mono text-red-700'>{errors.email?.message}</p>
 
                 </div>
 
