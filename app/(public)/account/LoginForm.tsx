@@ -1,21 +1,22 @@
 'use client'
 
-import { Auth } from 'aws-amplify'
-import { useAuthenticator } from '@aws-amplify/ui-react';
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-import { logUserIn, User } from '../../_slices/_auth';
+import { useSearchParams } from 'next/navigation';
+
+import Image from 'next/image';
+import githubMark from '/public/github-mark-white.png';
+import googleMark from '/public/google-mark.png';
+
+import { signIn } from 'next-auth/react';
+
+import { logUserIn, setLatestAuthEvent, User } from '../../_slices/_auth';
 import { useDispatch } from 'react-redux';
 
-import { Component, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader } from '@aws-amplify/ui-react';
 import { SecondaryBodyText } from '../../_primitives/Typography';
-import { CognitoUser } from '@aws-amplify/auth';
-import { log } from 'console';
 
 let renderCount = 0;
 
@@ -23,9 +24,11 @@ export const LoginForm = async () => {
 
     renderCount++;
 
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl") || "/account";
+
     const LoginForm = z.object({
         email: z.string().min(1, { message: 'Email is required.' }),
-        password: z.string().min(6, { message: 'Password must be at least 6 characters long.' })
     });
 
     type LoginFormSchema = z.infer<typeof LoginForm>;
@@ -40,79 +43,86 @@ export const LoginForm = async () => {
     } = useForm<LoginFormSchema>({
         defaultValues: {
             email: '',
-            password: ''
         },
         resolver: zodResolver(LoginForm)
     });
     
     const dispatch = useDispatch();
+    const router = useRouter();
 
     const submitLoginForm = async (data) => {
 
         console.log(data);
 
-        try {
+        const res = await signIn('email', { 
+            email: data.email, 
+            callbackUrl: 'http://localhost:3000/account' 
+        });
 
-            const user = await Auth.signIn(data.email, data.password);
-            const { sub, name, email } = user.attributes;
+        console.log(res);
 
-            const userData = await user.fetchUserData()
-            console.log(`User data:`);
-            console.log(userData);
+        if(res.ok && !res.error) {
+            console.log(res);
 
-            if( sub && name && email ) {
+            const newUser: User = {
 
-                const user = await Auth.currentAuthenticatedUser()
-                                            .then((user) => {
-
-                                                console.log(`current authenticated user:`);
-                                                console.log(user);
-
-                                                const userObject: User = {
-                                                    sub: sub,
-                                                    name: name,
-                                                    email: email,
-                                                    isAuthorized: "authorized",
-                                                };
-                                
-                                                dispatch(logUserIn(userObject));
-                                                
-                                            })
-                                            .catch((err) => {
-
-                                                console.log(err)
-
-                                            });
+                email: res?.user?.email,
+                name: res?.user?.name,
+                roles: res?.user?.roles
 
             }
 
-        } catch (error) {
+            dispatch(logUserIn(newUser));
+            dispatch(setLatestAuthEvent({
+                type: 'signIn',
+                event: {
+                    user: newUser,
+                }
+            }))
 
-            console.log(error);
-            setError('email', { type: error.type, message: 'Username or password is incorrect.' });
-
+        } else {
+            setError("email", { message: "Invalid email or password." });
         }
 
     }
 
-    const router = useRouter();
-
-    const { route, user, signOut, isPending } = useAuthenticator(context => [context.route, context.user, context.isPending])
-
-    console.log(`route: ${route}`);
-    console.log(`isPending: ${JSON.stringify(isPending)}`);
-
-    if (route === 'idle')
-        return <Loader size="large" />;
-
-    if (route === 'authenticated')
-        router.replace('/account');
+    const buttonClass = `mb-2 flex flex-row justify-between border border-slate-100/75 hover:border-slate-100 text-white font-mono font-light py-3 px-4 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600`;
 
     return (
 
         <>
 
-            <form className="space-y-6" action="addItem" onSubmit={handleSubmit(submitLoginForm)}>
+            <div className="flex flex-col w-full my-5">
+
+                <button
+                    className={`${buttonClass} bg-slate-800/25 hover:bg-slate-800/40`}
+                    onClick={() => signIn("github", { callbackUrl })}
+                >
+                    <Image
+                        src={githubMark}
+                        alt="Github"
+                        width={24}
+                        height={24}
+                    />
+                    Sign in with GitHub
+                </button>
+
+                <button
+                    className={`${buttonClass} bg-blue-800/25 hover:bg-blue-900/40 `}
+                    onClick={() => signIn("google", { callbackUrl })}
+                >                    
+                    <Image
+                        src={googleMark}
+                        alt="Google"
+                        width={24}
+                        height={24}
+                    />
+                    Sign in with Google
+                </button>
+
+            </div>
+
+            <form className="space-y-6 w-full" onSubmit={handleSubmit(submitLoginForm)}>
                 
                 <div>
                     
@@ -137,35 +147,6 @@ export const LoginForm = async () => {
 
                 <div>
 
-                    <div className="flex items-center justify-between">
-
-                        <label htmlFor="password" className="block text-sm font-medium leading-6 text-slate-300">Password</label>
-
-                            <div className="text-sm">
-                                <a href="#" className="font-semibold text-indigo-500 hover:text-indigo-400">Forgot password?</a>
-                            </div>
-
-                    </div>
-
-                    <div className="mt-2">
-                        
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            {...register("password", { required: true })}
-                            autoComplete="current-password"
-                            placeholder='●●●●●●●●●'
-                            required
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        />
-
-                    </div>
-
-                </div>
-
-                <div>
-
                     <p className='text-sm font-mono text-red-700'>{errors.email?.message}</p>
 
                 </div>
@@ -185,8 +166,6 @@ export const LoginForm = async () => {
 
                     <div className='p-4 rounded-md border-2 border-white/20'>
 
-                        <pre>Route: {route}</pre>
-                        <pre>User: {JSON.stringify(user)}</pre>
                         <pre>Render count: {JSON.stringify(renderCount)}</pre>
                     
                     </div>

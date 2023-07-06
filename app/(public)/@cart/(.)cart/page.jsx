@@ -6,10 +6,10 @@
 import {
 	Fragment, useContext,
 } from 'react';
+import Image from 'next/image';
+
 import { Dialog, Transition } from '@headlessui/react';
 import { useRouter, usePathname } from 'next/navigation';
-import { XMarkIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
 import { CartStateContext, CartDispatchContext } from '../../../_providers/cartProvider';
 import CartListItem from '../../../_primitives/CartListItem'
 import Formatter from '../../../_utils/moneyFormatter';
@@ -85,7 +85,7 @@ const CartModal = () => {
 												}}
 											>
 												<span className="sr-only">Close panel</span>
-												<XMarkIcon className="h-6 w-6" aria-hidden="true" />
+												<span className='material-symbols-rounded'>cancel</span>
 											</button>
 										</div>
 									</Transition.Child>

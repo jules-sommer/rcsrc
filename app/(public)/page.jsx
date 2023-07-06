@@ -1,5 +1,6 @@
 import { getProductByIsFeatured } from "../_utils/api";
-import FeaturedCard from "../_primitives/featureCard/featureCard";
+import FeaturedCard, { FeatureCardSkeleton } from "../_primitives/featureCard/featureCard";
+import { Suspense } from "react";
 
 const Hero = ({ title, blurb }) => {
 
@@ -21,6 +22,17 @@ const Hero = ({ title, blurb }) => {
         </section>
 
     );
+
+}
+
+const FeaturedProductsSkeleton = () => {
+
+    const featuredSkeletons = [];
+
+    for(let index = 0; index < 4; index++)
+        featuredSkeletons.push(<FeatureCardSkeleton />);
+
+    return featuredSkeletons;
 
 }
 
@@ -48,18 +60,21 @@ const Home = async () => {
 
                 <div class="w-[100%] px-12 grid grid-cols-4 grid-rows-1 grid-flow-col gap-4">
                     
-                    {typeof data === Array && data
-                        ? data.map((thisProduct, index) => (
-                        <FeaturedCard
-                            key={thisProduct._id}
-                            molName={thisProduct.molName}
-                            CAS={thisProduct.CAS}
-                            iupac={thisProduct.iupac}
-                            molSMILES={thisProduct.molSMILES}
-                            description={thisProduct.description}
-                        />
-                    )) : null}
-                    
+                    <Suspense fallback={<FeaturedProductsSkeleton />}>
+
+                        {data.map((product) => (
+                            <FeaturedCard
+                                key={product._id}
+                                molName={product.molName}
+                                CAS={product.CAS}
+                                iupac={product.iupac}
+                                molSMILES={product.molSMILES}
+                                description={product.description}
+                            />
+                        ))}
+
+                    </Suspense>
+                        
 				</div>
 
 			</section>

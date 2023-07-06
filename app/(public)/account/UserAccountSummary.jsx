@@ -2,35 +2,18 @@
 
 import { Heading, Badge, Button, TabItem, Tabs, View } from '@aws-amplify/ui-react';
 import { useUserInfo } from '../../_providers/useUserInfo';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import { Suspense } from 'react';
-import { Auth } from '@aws-amplify/auth';
 
 const UserAccountSummary = async () => {
 
+    const { data: session, status } = useSession();
+
     const [
-        user,
-        route,
+        authState,
+        signIn,
         signOut,
-        authState
     ] = useUserInfo();
-
-    const getUserSession = async () => {
-
-        try {
-
-            const session = await Auth.userSession();
-            console.log(session);
-
-            return session;
-
-        } catch (error) {
-
-            console.log(error);
-            return error;
-
-        }
-
-    }
 
     return (
 
@@ -44,12 +27,12 @@ const UserAccountSummary = async () => {
 
                     <Suspense fallback={<p>Loading user data...</p>}>
 
-                        <Heading level={3} className='text-sky-100 font-mono leading-loose mb-2'>{user.name}</Heading>
-                        <Heading level={6} className='text-sky-100/75 font-mono font-extralight leading-loose'>{user.email}</Heading>
-                        <Heading level={6} className='text-sky-100/75 font-mono font-extralight leading-loose'>{user.phone_number}</Heading>
+                        <Heading level={3} className='text-sky-100 font-mono leading-loose mb-2'></Heading>
+                        <Heading level={6} className='text-sky-100/75 font-mono font-extralight leading-loose'></Heading>
+                        <Heading level={6} className='text-sky-100/75 font-mono font-extralight leading-loose'></Heading>
 
                         <div className='my-6'>
-                            {user.groups ? user.groups.map((thisRole) => (<Badge variation="info" className='bg-sky-600 text-sky-50' size='large'>{thisRole}</Badge>)) : null}
+                            {/*user.groups ? user.groups.map((thisRole) => (<Badge variation="info" className='bg-sky-600 text-sky-50' size='large'>{thisRole}</Badge>)) : null*/}
                         </div>
 
                         <Button
@@ -65,7 +48,7 @@ const UserAccountSummary = async () => {
                             className='mt-4 border-red-600 border-2 font-mono font-light bg-red-600/30'
                             isFullWidth={true}
                             onClick={() => {
-                                signOut('/');
+                                signOut();
                             }}
                         >Sign Out</Button>
                         
@@ -77,24 +60,18 @@ const UserAccountSummary = async () => {
 
                     <Tabs>
 
-                        <TabItem title={"User Obj (Temp.)"} className='p-6'>
+                        <TabItem title={'User Session'}>
 
-                            <Heading level={3} className='font-mono text-slate-900'>user Object AWS:</Heading>
-                            <pre className='font-mono text-slate-800 whitespace-pre-wrap font-bold'>{JSON.stringify(user, undefined, 4)}</pre>        
-                    
+                            <Heading level={3} className='font-mono text-slate-900'>userSession:</Heading>
+                            <pre className='font-mono text-slate-800 whitespace-pre-wrap font-bold'>{JSON.stringify(session, undefined, 4)}</pre>
+                            <pre className='font-mono text-slate-800 whitespace-pre-wrap font-bold'>{JSON.stringify(status, undefined, 4)}</pre>
+
                         </TabItem>
 
                         <TabItem title={"Auth State (Temp.)"} className='p-6'>
 
                             <Heading level={3} className='font-mono text-slate-900'>authState:</Heading>
                             <pre className='font-mono text-slate-800 whitespace-pre-wrap font-bold'>{JSON.stringify(authState, undefined, 4)}</pre>
-
-                        </TabItem>
-                    
-                        <TabItem title={'User Session'}>
-
-                            <Heading level={3} className='font-mono text-slate-900'>userSession:</Heading>
-                            <pre className='font-mono text-slate-800 whitespace-pre-wrap font-bold'>{JSON.stringify(userSession, undefined, 4)}</pre>
 
                         </TabItem>
 

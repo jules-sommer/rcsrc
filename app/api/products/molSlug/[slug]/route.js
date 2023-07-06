@@ -1,8 +1,7 @@
 // query: { inStock: { $elemMatch: { $eq: true } } }
 
 import { stdout } from "process";
-import { getMongoClient } from "../../../../_utils/db"
-import clientPromise from "../../../../_utils/db";
+import clientPromise from '../../../../_lib/db'
 import { NextResponse } from "next/server";
 
 export const GET = async (request, context) => {

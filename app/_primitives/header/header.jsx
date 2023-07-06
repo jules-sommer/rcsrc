@@ -4,6 +4,7 @@ import Link from "next/link"
 import HeaderCartIcon from './headerCartIcon';
 import UserHeaderControls from "./UserHeaderControls";
 import { Suspense } from "react";
+import { signIn, signOut } from "next-auth/react";
 
 const Header = ({
 

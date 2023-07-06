@@ -1,68 +1,45 @@
-import { Auth, withSSRContext } from 'aws-amplify';
 import { headers, cookies } from 'next/headers'
-import awsExports from '../../aws-exports';
-import { Amplify } from 'aws-amplify'
 import _ from 'lodash'
 import chalk from 'chalk'
 import UserAccountSummary from './UserAccountSummary'
 import { redirect } from 'next/navigation'
-
-// Amplify.Logger.LOG_LEVEL = 'DEBUG';
-Amplify.configure({ ...awsExports, ssr: true });
-const fetcher = (url) => fetch(url).then((res) => res.json());
+import { getServerSession } from 'next-auth'
+import { authOptions } from '../../api/auth/[...nextauth]/auth';
 
 const Account = async (request, context) => {
-    
-    const headerCookie = headers().get('cookie');
 
-    console.debug(`\n\nHEADER COOKIE:\n\n`);
-    console.debug(JSON.stringify(headerCookie, undefined, 4));
+    const session = await getServerSession(authOptions);
 
-    // Construct a req object & prepare an SSR enabled version of Amplify
-    const req = {
-        headers: {
-            cookie: headerCookie,
-        },
-    };
+    if (session) {
 
-    try {
+        let hasName;
+        let hasRoles;
 
-        const SSR = withSSRContext({ req })
-        const user = await SSR.Auth.currentAuthenticatedUser()
+        if (session.user.name)
+            hasName = true;
+        else
+            hasName = false;
+
+        if (session.user.roles)
+            hasRoles = true;
+        else
+            hasRoles = false;
         
-        let newUserObj = {
-            ...user.signInUserSession.idToken.payload,
-            username: user.signInUserSession.idToken.payload["cognito:username"],
-            isAuthenticated: true,
-            //cartStore: JSON.parse(user.pool.storage.store.cartStore),
-            storage: { ...user.pool.storage.store }
-        }
-
-        // Remove 'cognito:' from the keys using lodash _.mapKeys
-
-        newUserObj = _.mapKeys(newUserObj, (value, key) => {
-                            if (key.includes('cognito:')) {
-                                return key.replace('cognito:', '');
-                            } else {
-                                return key;
-                            }
-                        });
-    
-        console.debug(JSON.stringify(newUserObj, undefined, 4))
-                    
         return (
 
-            <UserAccountSummary />
+            <div>
 
-        )
+                <h1 className='text-lg font-mono text-white'>Welcome to your account, {hasName ? session.user.name : session.user.email}</h1>
+                <pre>{JSON.stringify(session, undefined, 4)}</pre>
+            
+            </div>
 
-    } catch (error) {
-        
-        console.error(chalk.bgRedBright(error));
+        );
 
-        // Redirect the user to the login page.
-        redirect('/account/login')
-        
+    } else {
+
+        redirect('/account/login');
+
     }
 
 }

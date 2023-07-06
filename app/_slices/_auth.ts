@@ -3,58 +3,59 @@ import {
 	PayloadAction,
 	createReducer,
 } from '@reduxjs/toolkit';
-import { Auth } from '@aws-amplify/auth';
 import { uniqueId } from 'lodash';
 
 type userState = {
 	value: {
-		sub: String;
+		id: String;
 		email: String;
 		name: String;
 		roles: String[];
 		hasCart: Boolean;
-		isAuthorized: "authorized" | "idle" | "setup"
+		isAuthorized: "authorized" | "unauthorized" | "setup"
 	},
-	latestAuthEvent: {
-		type: String;
-		event: Object;
-	}
+	authEvents: authEvent[]
+}
+
+export type authEvent = {
+
+	type: String;
+	event: Object;
+
 }
 
 const initialState = {
 	value: {
-		sub: "",
+		id: "",
 		email: "",
 		name: "",
-		roles: [],
+		roles: ["User"],
 		hasCart: false,
-		isAuthorized: "setup"
+		isAuthorized: "unauthorized"
 	},
-	latestAuthEvent: {
-		type: "",
-		event: {}
-	}
+	authEvents: [],
 } as userState;
 
 export type User = {
 
-	sub: String;
+	id?: String;
 	email: String;
 	name: String;
 	roles?: String[];
 	hasCart?: Boolean;
-	isAuthorized?: "authorized" | "idle" | "setup"
+	isAuthorized?: "authenticated" | "unauthorized" | "loading";
+	expiresAt?: Date;
 
 }
 
-type AuthEvent = {
+export type AuthEvent = {
 	type: String;
 	event: Object;
 }
 
-const cart = createSlice({
+const auth = createSlice({
 
-	name: 'cart',
+	name: 'auth',
 	initialState,
 	reducers: {
 
@@ -68,28 +69,43 @@ const cart = createSlice({
 
 			return {
 				...state,
-				latestAuthEvent: {
-					type: type,
-					event: event
-				}
+				authEvents: [
+					{
+						type: type,
+						event: event
+					},
+					...state.authEvents,
+				]
 			}
 
 		},
 
 		logUserIn: (state, action: PayloadAction<User>) => {
 			
-			const { sub, email, name, roles, hasCart, isAuthorized } = action.payload;
+			const { 
+				id, 
+				email, 
+				name, 
+				roles, 
+				hasCart, 
+				isAuthorized
+			} = action.payload;
+
+			if( isAuthorized === "unauthorized" || isAuthorized === "loading" )
+				return { ...initialState };
 
 			return {
-				...state,
 				value: {
-					sub: sub,
+					id: id,
 					email: email,
 					name: name,
 					roles: roles ? roles : [],
 					hasCart: hasCart ? hasCart : false,
-					isAuthorized: isAuthorized
-				}
+					isAuthorized: isAuthorized === "authenticated" ? "authenticated" : "unauthorized"
+				},
+				authEvents: [
+					...state.authEvents,
+				]
 			}
 
 		}
@@ -99,5 +115,5 @@ const cart = createSlice({
 
 })
 
-export const { signUserOut, logUserIn, setLatestAuthEvent } = cart.actions;
-export default cart.reducer;
+export const { signUserOut, logUserIn, setLatestAuthEvent } = auth.actions;
+export default auth.reducer;

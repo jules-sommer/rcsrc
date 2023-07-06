@@ -1,6 +1,16 @@
 import sanitize from 'mongo-sanitize';
+import { ObjectId } from 'mongodb';
+import { toString } from 'lodash';
 
-export const getProductsInStock = async (isInStock) => {
+export interface OrderingOptions {
+
+    containers: ObjectId[];
+    concentrations: ObjectId[];
+    solvents: ObjectId[];
+
+}
+
+export const getProductsInStock = async (isInStock: Boolean) => {
 
     const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/inStock/${isInStock}`);
     const result = await raw.json();
@@ -14,7 +24,7 @@ export const getCurrentUser = async () => {
 
 }
 
-export const getProductByScaffold = async (scaffold) => {
+export const getProductByScaffold = async (scaffold: ObjectId) => {
 
     const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/scaffold/${scaffold}`);
     const result = await raw.json();
@@ -23,7 +33,7 @@ export const getProductByScaffold = async (scaffold) => {
 
 }
 
-export const getProductByIsFeatured = async (isFeatured, limit = 4) => {
+export const getProductByIsFeatured = async (isFeatured: Boolean, limit = 4) => {
 
     const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/isFeatured/${isFeatured}?limit=${limit}`, { next: { revalidate: 7200 } });
     const result = await raw.json();
@@ -32,7 +42,7 @@ export const getProductByIsFeatured = async (isFeatured, limit = 4) => {
 
 }
 
-export const getProductSolventsById = async (productId) => {
+export const getProductSolventsById = async (productId: ObjectId) => {
 
     const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/options/solvents/${productId}`);
     const result = await raw.json();
@@ -44,7 +54,7 @@ export const getProductSolventsById = async (productId) => {
 // PRODUCT ATTRIBUTES
 // TO-DO: Refactor this to use the new API, which will be a lot more efficient, and will allow for more flexibility
 
-export const getProductContainersById = async (productId) => {
+export const getProductContainersById = async (productId: ObjectId) => {
 
     const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/options/containers/${productId}`);
     const result = await raw.json();
@@ -53,7 +63,7 @@ export const getProductContainersById = async (productId) => {
 
 }
 
-export const getProductConcentrationsById = async (productId) => {
+export const getProductConcentrationsById = async (productId: ObjectId) => {
 
     const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/options/concentrations/${productId}`);
     const result = await raw.json();
@@ -62,11 +72,11 @@ export const getProductConcentrationsById = async (productId) => {
 
 }
 
-export const getProductAttributes = async (orderingOptions, productId) => {
+export const getProductAttributes = async (orderingOptions: OrderingOptions, productId: ObjectId) => {
 
     let promiseArray = [];
 
-    let optionsSanitized = orderingOptions.map((option) => sanitize(_.toString(option)));
+    let optionsSanitized = Object.keys(orderingOptions).map((option) => sanitize(toString(option)));
 
     console.debug(optionsSanitized);
 
@@ -83,7 +93,7 @@ export const getProductAttributes = async (orderingOptions, productId) => {
 
 // END PRODUCT ATTRIBUTES
 
-export const getProductBySlug = async (molSlug) => {
+export const getProductBySlug = async (molSlug: String) => {
 
     const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/molSlug/${sanitize(molSlug)}`, { next: { revalidate: 60 } });
     

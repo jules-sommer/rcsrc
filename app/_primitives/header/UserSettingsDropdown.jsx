@@ -3,20 +3,18 @@
 import { Fragment } from 'react'
 import { useAuthenticator } from '@aws-amplify/ui-react'
 import { Menu, Transition } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { View, Button, VisuallyHidden } from "@aws-amplify/ui-react";
 import Link from 'next/link';
 import { useUserInfo } from '../../_providers/useUserInfo'
 
+import { signIn, signOut } from 'next-auth/react';
+
+import { setLatestAuthEvent, signUserOut } from "../../_slices/_auth";
+import { useDispatch } from "react-redux";
+
 const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
 const UserSettingsDropdown = () => {
-
-	const [
-		user,
-		route,
-		signUserOut
-	] = useUserInfo();
 
 	return (
 
@@ -24,14 +22,9 @@ const UserSettingsDropdown = () => {
 
 			<div>
 				
-				<Menu.Button className="inline-flex">
-					<Button
-						variation={'menu'}
-						onClick={() => {
-							console.log('les click de button')
-						}}
-						size="small"
-						className="font-mono text-sky-200 ml-3"
+				<Menu.Button className="inline-flex items-center justify-center flex-grow-0">
+					<button
+						className="font-mono text-sky-200 ml-3 p-2 border-2 border-sky-200 rounded-md h-min "
 					>
 						<span className="material-symbols-rounded !inline-flex items-center justify-center py-4 px-2 pr-4 w-2 h-2 text-lg">
 							account_circle
@@ -39,8 +32,7 @@ const UserSettingsDropdown = () => {
 						<span className="material-symbols-rounded !inline-flex items-center justify-center py-4 px-2 w-2 h-2 text-lg">
 							arrow_drop_down
 						</span>
-						<VisuallyHidden>Menu open button for my account settings...</VisuallyHidden>
-					</Button>
+					</button>
 				</Menu.Button>
 				
 			</div>
@@ -81,7 +73,12 @@ const UserSettingsDropdown = () => {
 							{({ active }) => (
 							<button
 								onClick={() => {
-									signUserOut('/');	
+									signOut();
+									useDispatch(signUserOut());
+									useDispatch(setLatestAuthEvent({
+										type: 'signOut',
+										timestamp: Date.now(),
+									}))	
 								}}
 								className={classNames(
 								active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',

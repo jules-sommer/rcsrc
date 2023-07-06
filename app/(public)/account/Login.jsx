@@ -1,4 +1,3 @@
-import { Auth, Hub } from 'aws-amplify';
 import Image from 'next/image';
 import { LoginForm } from './LoginForm';
 import Logo from '../../_primitives/Logo';
@@ -15,18 +14,6 @@ export const Login = () => {
 
     let formState;
 
-    Hub.listen('auth', (data) => {
-
-        const event = data.payload.event;
-        console.log('Auth Event:', event);
-
-        if (event === "signOut")
-            console.log('user signed out...');
-        else if (event === "signIn")
-            console.log('user has signed in....');
-        
-    });
-
     return (
     
         <main>
@@ -35,14 +22,14 @@ export const Login = () => {
 
                 <div className="w-1/3 flex flex-col items-center justify-center">
                     <Logo
-                        className={`mx-auto my-5 w-full`}
-                        scale={1.25} />
+                        className={`mx-auto my-5 mb-0 w-full`}
+                        scale={2.25} />
                         
                 </div>
 
-                <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                <div className="mt-3 flex flex-col items-center justify-center sm:mx-auto sm:w-full sm:max-w-sm">
                     
-                    <Suspense>
+                    <Suspense fallback={<p>Loading login form...</p>}>
                         <LoginForm />
                     </Suspense>
                         

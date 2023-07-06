@@ -24,11 +24,11 @@ const MolListItem = async ({ key, molName, molSMILES, CAS, description, tags = [
 	return (
 
         <Link
-            key={key}
             id={key}
+            custom_key={key}
             href={`/molecules/${slugify(molName)}`}
-            aria-disabled={!inStock}
-            disabled={!inStock}
+            aria-disabled={!inStock.value >= 0}
+            disabled={!inStock.value >= 0}
             >
             
             <div className={`h-64 w-[100%] flex flex-row transition-all hover:origin-center ${inStock ? 'cursor-pointer hover:scale-[1.025]' : 'opacity-75 cursor-default' } bg-gradient-to-t from-indigo-200 via-blue-200 to-sky-200 rounded-2xl`}>
@@ -47,6 +47,7 @@ const MolListItem = async ({ key, molName, molSMILES, CAS, description, tags = [
 
                         <h3 className='name whitespace-nowrap text-slate-900 font-mono text-md font-bold'>{molName}</h3>
                         <h4 className='font-mono text-sm mb-2'><b>CAS# </b>{CAS}</h4>
+                        <p>In Stock: {JSON.stringify(inStock)}</p>
                     
                     </div>
 
@@ -67,7 +68,7 @@ const MolListItem = async ({ key, molName, molSMILES, CAS, description, tags = [
                                 key={index}
                                 size={'large'}
                                 variation={'info'}
-                                className="inline-flex mr-1 whitespace-nowrap w-min flex-shrink flex-grow-0 h-min text-sm leading-tight mt-2 py-[2px] px-3 text-sky-100 font-extralight font-mono "
+                                className=""
                             >{thisTag}</MoleculeBadge>
                         ))}
                     
@@ -140,11 +141,7 @@ const ListAllMolecules = async () => {
                 <Suspense fallback={<MoleculeListSkeleton numGridItems={6} />}>
 
                     {data !== undefined ?
-                        data.map((thisProduct) => {
-
-                            console.log(thisProduct);
-                        
-                            return (
+                        data.map((thisProduct) => (
                         
                                 <MolListItem
                                     key={thisProduct._id}
@@ -154,11 +151,11 @@ const ListAllMolecules = async () => {
                                     molSMILES={thisProduct.molSMILES}
                                     tags={thisProduct.tags}
                                     scaffoldID={has(thisProduct, 'scaffold') ? thisProduct.scaffold : false}
-                                    inStock={has(thisProduct, 'inStock') ? thisProduct.inStock.value >= 0 : false}
+                                    inStock={has(thisProduct, 'inStock') && thisProduct.inStock.value >= 0 ? true : false}
                                 />
                             
                             )
-                        }) : null
+                        ) : null
                     }
                     
                 </Suspense>

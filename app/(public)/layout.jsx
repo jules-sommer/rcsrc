@@ -11,17 +11,7 @@ import CartContextProvider from '../_providers/cartProvider';
 import { ClientProvider, useIsClient } from '../_providers/isClientProvider';
 
 import { UseNextAuth } from '../_providers/UseNextAuth';
-import { SessionProvider } from 'next-auth/react';
-
 import WithReduxState from '../_providers/WithReduxProvider';
-
-import UseAwsAuth from '../_providers/useAwsAuth';
-
-import { Amplify } from 'aws-amplify';
-import AwsExports from '../aws-exports';
-import { UseHubListener } from '../_providers/UseHubListener';
-
-Amplify.configure({ ...AwsExports, ssr: true });
 
 export const metadata = {
 	title: 'RCSrc Canada',
@@ -39,33 +29,25 @@ const RootLayout = ({ children, cart, ...pageProps }) => {
 
 				<WithReduxState>
 
-					<UseHubListener>
+					<UseNextAuth>
 
-						<UseNextAuth>
+						<ClientProvider>
 
-							<UseAwsAuth>
+							<CartContextProvider>
 
-								<ClientProvider>
+								<Header />
 
-									<CartContextProvider>
+								{cart}
 
-										<Header />
+								<main className='pt-[86px] bg-slate-950'>{children}</main>
 
-										{cart}
+								<Footer />
+								
+							</CartContextProvider>
 
-										<main className='pt-[86px] bg-slate-950'>{children}</main>
+						</ClientProvider>
 
-										<Footer />
-										
-									</CartContextProvider>
-
-								</ClientProvider>
-
-							</UseAwsAuth>
-
-						</UseNextAuth>
-
-					</UseHubListener>
+					</UseNextAuth>
 
 				</WithReduxState>
 

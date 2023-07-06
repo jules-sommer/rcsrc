@@ -1,4 +1,4 @@
-import clientPromise, { getMongoClient } from "../../../../_utils/db"
+import clientPromise from '../../../../_lib/db'
 import { NextResponse } from "next/server";
 import { toSafeInteger } from "lodash";
 

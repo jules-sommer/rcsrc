@@ -1,10 +1,10 @@
 import { stdout } from "process";
-import { getMongoClient } from "../../_utils/db";
+import clientPromise from '../../_lib/db'
 import { NextResponse } from "next/server";
 
 export const GET = async (request, context) => {
     
-    const client = await getMongoClient(); 
+    const client = await clientPromise; 
     const products = client.db('data').collection('products');
 
     try {
