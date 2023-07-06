@@ -1,4 +1,4 @@
-import clientPromise from '../../../../../_lib/db'
+import clientPromise from "../../../../_lib/db";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import _ from 'lodash';

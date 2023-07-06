@@ -1,5 +1,4 @@
 import { headers, cookies } from 'next/headers'
-import _ from 'lodash';
 import chalk from 'chalk'
 
 const DashboardLayout = async ({ children }) => {

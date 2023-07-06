@@ -15,7 +15,6 @@ import { RadioGroup, Switch, Tab } from '@headlessui/react';
 import {
 	useState, useReducer, useContext, useMemo, useEffect,
 } from 'react';
-import { CheckIcon, ChevronDoubleRightIcon } from '@heroicons/react/20/solid';
 import { PRODUCT_LIST } from '../molecules.productList';
 import { CartDispatchContext, CartStateContext } from '../../../_providers/cartProvider';
 import PropTypes from 'prop-types';
@@ -143,7 +142,7 @@ const ContainerSelector = ({ options, dispatch }) => {
                                 ui-not-active:bg-white/10 ui-not-active:text-white/50 ui-not-active:border-2 ui-not-active:border-slate-600
                                     p-5 rounded-md mb-5 flex flex-row items-center grow first-of-type:mt-5 last-of-type:mb-0"
 						>
-							<CheckIcon className="hidden shrink-0 ui-checked:block h-6 pr-6 text-lime-400" />
+							<span className="material-symbols-rounded">check</span>
 							<span className="whitespace-pre-line">{thisContainer.name}</span>
 						</RadioGroup.Option>
 					))}
@@ -173,7 +172,7 @@ const TabWrapper = ({ num, text }) => (
 			{num}
 		</span>
 
-		<ChevronDoubleRightIcon className="shrink-0 w-6 h-6 mr-3" />
+		<span class="material-symbols-rounded shrink-0 w-6 h-6 mr-3">double_arrow</span>
 		<span className="transition-all hover:translate-y-[-2px]">{text}</span>
 
 	</Tab>
@@ -274,7 +273,7 @@ const PowderComposition = ({ options, dispatch }) => {
 								>
 
 									<div className="flex p-5 w-full text-sm justify-between border-b-2 border-slate-700 ui-active:border-sky-400 ui-checked:border-sky-400">
-										<CheckIcon className="invisible shrink-0 ui-checked:visible h-4 pr-4 text-lime-400" />
+										<span className="material-symbols-rounded">check</span>
 										<span className="whitespace-pre-line">{thisContainer.name}</span>
 									</div>
 
@@ -543,7 +542,7 @@ const SolutionComposition = ({ options, dispatch }) => {
                                             ui-not-active:bg-white/10 ui-not-active:text-white/50 ui-not-active:border-2 ui-not-active:border-slate-600
                                                 p-5 rounded-md mb-5 w-[100%] grow flex flex-row items-center first-of-type:mt-5 last-of-type:mb-0"
 									>
-										<CheckIcon className="hidden shrink-0 ui-checked:block ui-active:block h-6 pr-6 text-lime-400" />
+										<span className="material-symbols-rounded">check</span>
 										<span className="whitespace-pre-line">{thisSolvent.name}</span>
 									</RadioGroup.Option>
 								))}
@@ -578,7 +577,7 @@ const SolutionComposition = ({ options, dispatch }) => {
 								>
 
 									<div className="flex p-5 w-full text-sm justify-between border-b-2 border-slate-700 ui-active:border-sky-400 ui-checked:border-sky-400">
-										<CheckIcon className="invisible shrink-0 ui-checked:visible h-4 pr-4 text-lime-400" />
+										<span className="material-symbols-rounded">check</span>
 										<span className="whitespace-pre-line">{thisContainer.name}</span>
 									</div>
 
@@ -1024,30 +1023,30 @@ const OrderingOptions = ({ id, molName, initialOptions }) => {
 							
 							<div>
 								<span className="flex items-center text-white/50 my-2">
-									<ChevronDoubleRightIcon className="h-4 w-4 mx-3" />
+									<span class="material-symbols-rounded h-4 w-4 mx-3">double_arrow</span>
 									{options.isSterile ? 'Sterile' : 'Non-Sterile'}
 								</span>
 								<span className="flex items-center text-white/50 my-2">
-									<ChevronDoubleRightIcon className="h-4 w-4 mx-3" />
+								<span class="material-symbols-rounded h-4 w-4 mx-3">double_arrow</span>
 									{options.addPreservative ? 'w/ Preservative' : 'w/o Preservative'}
 								</span>
 
 								{options.solvents.selected ? (
 									<span className="flex items-start justify-start text-white/50 my-2">
-										<ChevronDoubleRightIcon className="h-4 w-4 mx-3 shrink-0" />
+										<span class="material-symbols-rounded h-4 w-4 mx-3 shrink-0">double_arrow</span>
 										{options.solvents.selected.name}
 									</span>
 								) : null }
 
 								{options.containers.selected ? (
 									<span className="flex items-center text-white/50 my-2">
-										<ChevronDoubleRightIcon className="h-4 w-4 mx-3 shrink-0" />
+										<span class="material-symbols-rounded h-4 w-4 mx-3 shrink-0">double_arrow</span>
 										{options.containers.selected.shortHand}
 									</span>
 								) : null }
 
 								<span className="flex items-center text-white/50 my-2">
-									<ChevronDoubleRightIcon className="h-4 w-4 mx-3" />
+									<span class="material-symbols-rounded h-4 w-4 mx-3">double_arrow</span>
 									{options.quantities.selected !== false ? `${options.quantities.values[options.quantities.selected]} ${options.quantities.unit}` : false }
 								</span>
 							
@@ -1063,13 +1062,13 @@ const OrderingOptions = ({ id, molName, initialOptions }) => {
 						<>
 
 							<span className="flex items-center text-white/50">
-								<ChevronDoubleRightIcon className="h-4 w-4 mx-3" />
+								<span class="material-symbols-rounded h-4 w-4 mx-3">double_arrow</span>
 								{options.quantities.selected !== false ? `${options.quantities.values[options.quantities.selected]} ${options.quantities.unit}` : false }
 							</span>
 
 							{options.containers.selected ? (
 								<span className="flex items-center text-white/50">
-									<ChevronDoubleRightIcon className="h-4 w-4 mx-3" />
+									<span class="material-symbols-rounded h-4 w-4 mx-3">double_arrow</span>
 									{options.containers.selected.shortHand}
 									</span>
 							) : null }
