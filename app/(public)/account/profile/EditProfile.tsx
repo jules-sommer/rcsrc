@@ -11,6 +11,8 @@ import * as z from "zod";
 import { useUserInfo } from "../../../_providers/useUserInfo";
 import { useEffect, useState } from "react";
 
+import type { User } from "../../../_slices/_auth";
+
 export const EditProfile = () => {
 
     const { data: session, status, update } = useSession();
