@@ -96,7 +96,7 @@ export const EditProfile = () => {
             </div>
 
             <div className="m-8 tabs tabs-boxed flex justify-between">
-                {tabs.map((tab, index) => (<button id={1} onClick={() => {
+                {tabs.map((tab, index) => (<button id={index} onClick={() => {
                     setActiveTab(index);
                 }} className={`tab tab-lg font-mono text-md font-bold flex-grow ${activeTab === index ? 'tab-active !bg-accent' : null}`}>{tab}</button>))}
             </div>
