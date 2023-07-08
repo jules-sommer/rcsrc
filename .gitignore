@@ -60,4 +60,6 @@ amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
 **.sample
+aws-exports.js
+/amplify/team-provider-info.json
 #amplify-do-not-edit-end
