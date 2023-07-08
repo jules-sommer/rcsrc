@@ -15,9 +15,33 @@ module.exports = {
       }
     }
   },
+  daisyui: {
+    themes: [
+      {
+        lsd: {
+          "primary": "#ff546c",
+          "secondary": "#5eead4",
+          "accent": "#14b8a6",
+          "neutral": "#020617",
+          "base-100": "#1d1a48",
+          "info": "#5fb8e7",
+          "success": "#139a7b",
+          "warning": "#af760e",
+          "error": "#dc3848",
+        },
+      },
+      "cupcake",
+      "synthwave",
+      "cyberpunk",
+      "retro",
+      "valentine",
+    ],
+  },
   plugins: [
-    require('@tailwindcss/forms'),
     require('@headlessui/tailwindcss'),
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+    require("daisyui"),
   ]
 }
 

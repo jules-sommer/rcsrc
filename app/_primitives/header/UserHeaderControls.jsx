@@ -22,7 +22,10 @@ const UserHeaderLoadingSkeleton = () => (
         
         <div className='flex flex-col items-end justify-center leading-tight'>
             <p className="block text-sky-100 min-w-[75px] min-h-[20px] rounded-md bg-slate-700/75 animate-pulse font-medium font-mono text-s"/>
-            <Badge variation="info" className='block bg-sky-600/75 min-h-[15px] animate-pulse min-w-[35px] text-sm leading-tight mt-1 py-[2px] px-3 text-sky-100 font-extralight font-mono' size='large'/>
+            <span className={`
+            text-md px-2 py-1 my-1 mx-[2px] bg-gradient-to-tr from-sky-400/25 to-cyan-950 rounded-full border-[1px] border-cyan-700
+            items-center justify-center inline-flex mr-1 whitespace-nowrap w-min flex-shrink flex-grow-0 h-min
+            text-sm leading-tight text-sky-300 font-extralight font-mono`}>loading...</span>
         </div>
 
         <UserSettingsDropdown />
@@ -34,23 +37,28 @@ const UserHeaderLoadingSkeleton = () => (
 const UserHeaderControls = async () => {
 
     const { data: session, status } = useSession();
-    const { authState, signIn, signOut } = useUserInfo();
-
     const router = useRouter();
 
     if (status === 'loading')
-        return <p>Loading user data...</p>
+        return <UserHeaderLoadingSkeleton/>
 
     if (status === 'authenticated') {
     
+        let hasName = session.user.name ? true : false;
+
         return (
         
             <div className="flex flex-row">
     
                 <div className='flex flex-col items-end justify-center leading-tight'>
-                    <p className="block text-sky-100 font-medium font-mono text-s">{session.user.name}</p>
+                    <p className="block text-sky-100 font-medium font-mono text-s">{hasName ? session.user.name : session.user.email}</p>
                     <div className="flex flex-row">
-                        {session.user.roles ? session.user.roles.map((thisGroup) => (<Badge variation="info" className='block bg-sky-600 text-sm leading-tight mt-1 py-[2px] px-3 text-sky-100 font-extralight font-mono' size='large'>{thisGroup}</Badge>)) : null}
+                        {session.user.roles ? session.user.roles.map((thisGroup) => (
+                            <span className={`
+                            text-md px-2 py-1 my-1 mx-[2px] bg-gradient-to-tr from-sky-400/25 to-cyan-950 rounded-full border-[1px] border-cyan-700
+                            items-center justify-center inline-flex mr-1 whitespace-nowrap w-min flex-shrink flex-grow-0 h-min
+                            text-sm leading-tight text-sky-300 font-extralight font-mono`}>{thisGroup}</span>
+                        )) : null}
                     </div>
                 </div>
     

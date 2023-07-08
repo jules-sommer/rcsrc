@@ -5,6 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 import { MongoDBAdapter } from "@auth/mongodb-adapter"
 import type { MongoDBAdapterOptions } from '@auth/mongodb-adapter';
+import { ObjectId } from 'mongodb';
 
 import nodemailer from 'nodemailer';
 
@@ -17,13 +18,15 @@ import EmailProvider from "next-auth/providers/email"
 
 import chalk from 'chalk';
 
-// can't do redux on server but I am  an idiot so it's imported here anyways
 import type { User, AuthEvent } from '../../../_slices/_auth';
+import { store } from '../../../_store/store';
 import { logUserIn, setLatestAuthEvent, signUserOut } from '../../../_slices/_auth';
-import { useDispatch } from 'react-redux';
+
+
+import { updateUserById } from '../../../_utils/api';
+import type { User } from '../../../_slices/_auth';
 
 import { uniqueId } from 'lodash';
-import { log } from 'console';
 
 import type { MongoClient } from 'mongodb';
 
@@ -132,26 +135,71 @@ sessions to the DB ).
 
         },
         
-        session: async({ session, trigger, token, user }) => {
+        session: async({ session, trigger, token, user, newSession }) => {
 
-            if( user.id === '64a5e8dcb27593e2a2421213' ) {
-                user.roles = [
-                    'admin',
-                    'kitten'
-                ]
-            } else {
-                user.roles = [
-                    'user'
-                ]
+            if( trigger === 'update' ) {
+
+                console.log(chalk.bgRedBright('SESSION UPDATE TRIGGERED'));
+                console.log(chalk.bgRedBright(JSON.stringify(newSession)));
+
+                try {
+
+                    const result = await updateUserById({ id: session.user.id as string, user: newSession as User});
+
+                    if( result.success == true ) {
+
+                        console.log(typeof result);
+                        console.log(chalk.bgGreenBright(JSON.stringify(result.data.fieldsAdded)));
+
+
+                        const latestAuthEvent: AuthEvent = {
+                            type: 'update',
+                            event: {
+                                userId: session.user.id,
+                                fieldsAdded: result.data.fieldsAdded,
+                                newSession: {
+                                    ...session,
+                                    user: result.data.updatedUser
+                                },
+                                time: Date().now()
+
+                            }
+                        }
+
+                        store.dispatch(setLatestAuthEvent(latestAuthEvent));
+
+                        return {
+                            ...session,
+                            user: result.data.updatedUser
+                        };
+
+                    } else {
+
+                        throw new Error('Failed to update user in database');
+                        return {
+                            ...session,
+                            user:  { ...user }
+                        };
+
+                    }
+
+                } catch( error ) {
+
+                    console.log(chalk.bgRedBright(JSON.stringify(error)));
+
+                    return {
+                        ...session,
+                        user:  { ...user }
+                    };
+
+                }
+
             }
 
-            session.user = user;
-
-            console.log(chalk.bgBlueBright(JSON.stringify(session)));
-            console.log(chalk.bgGreenBright(JSON.stringify(token))); // undefined because we're not using jwt
-            console.log(chalk.bgWhiteBright(JSON.stringify(user)));
-
-            return session;
+            return {
+                ...session,
+                user:  { ...user }
+            };
 
         },
 

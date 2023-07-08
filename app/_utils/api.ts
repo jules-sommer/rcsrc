@@ -1,6 +1,7 @@
 import sanitize from 'mongo-sanitize';
 import { ObjectId } from 'mongodb';
 import { toString } from 'lodash';
+import type { User } from '../_slices/_auth';
 
 export interface OrderingOptions {
 
@@ -118,7 +119,7 @@ export const getProducts = async () => {
 }
 
 // Get pharmacore / scaffold by ID, if no ID is passed it returns all scaffolds
-export const getScaffoldByID = async (id = '') => {
+export const getScaffoldByID = async ({ id = '' } : { id: string }) => {
 
     let cleanId = sanitize(id);
 
@@ -126,5 +127,23 @@ export const getScaffoldByID = async (id = '') => {
     const result = await raw.json();
 
     return result;
+
+}
+
+export const updateUserById = async ({ id, user } : { id: string, user: User }) => {
+
+    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/update/${id}`, {
+        method: 'POST',
+        body: JSON.stringify(user),
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    });
+
+    const result = await raw.json();
+
+    return result;
+
 
 }

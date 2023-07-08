@@ -5,6 +5,10 @@ import UserAccountSummary from './UserAccountSummary'
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../api/auth/[...nextauth]/auth';
+import { EditProfile } from './profile/EditProfile'
+import Image from 'next/image'
+import { slugify } from '../../_utils/utils'
+import { Suspense } from 'react'
 
 const Account = async (request, context) => {
 
@@ -12,26 +16,60 @@ const Account = async (request, context) => {
 
     if (session) {
 
-        let hasName;
-        let hasRoles;
+        console.log(chalk.bgMagentaBright('/account/page.jsx has a mother fucking session babey'));
+        console.log(chalk.bgMagentaBright(JSON.stringify(session, undefined, 4)));
 
-        if (session.user.name)
-            hasName = true;
-        else
-            hasName = false;
-
-        if (session.user.roles)
-            hasRoles = true;
-        else
-            hasRoles = false;
+        let hasName = session.user.name ? true : false;
+        let hasRoles = session.user.roles ? true : false;
+        let hasEmail = session.user.email ? true : false;
         
         return (
 
-            <div>
+            <div className='w-9/12 mx-auto py-12 grid gap-8 grid-cols-6 auto-rows-min'>
 
-                <h1 className='text-lg font-mono text-white'>Welcome to your account, {hasName ? session.user.name : session.user.email}</h1>
-                <pre>{JSON.stringify(session, undefined, 4)}</pre>
-            
+                <div className={`
+                    flex flex-col col-span-2 h-min items-center px-8 py-12 max-w-xs
+                    bg-gradient-to-br from-indigo-900/50 via-cyan-900/50 to-blue-900/50
+                    border-2 border-cyan-800 rounded-3xl`}>
+
+                    <Image
+                        src={`https://api.dicebear.com/6.x/bottts/png?seed=${slugify(session.user.email.split('@')[0])}}`}
+                        width={100}
+                        height={100}
+                        className='rounded-full mask mask-hexagon bg-accent my-6'
+                    />
+
+                    <div className='text-sky-100 flex flex-col items-center justify-center text-center prose'>
+                        {hasName ? (<h1 className='font-bold mb-0 my-5'>{session.user.name}</h1>) : null}
+                        {hasEmail ? (<h2 className='my-3 font-light'>{session.user.email}</h2>) : null}
+                    </div>
+
+                    {hasRoles ? (
+
+                        <div className="mt-8">
+
+                            {session.user.roles.map((thisRole) => (
+
+                                <div className="badge badge-accent badge-lg font-mono text-white border-2 px-3 py-3 first-of-type:ml-0 ml-3">{thisRole}</div>
+
+                            ))}
+
+                        </div>
+                        
+                    ) : null}
+                    
+
+                </div>
+
+                <div className={`
+                    flex flex-col col-span-4 flex-grow`}>
+
+                    <Suspense fallback={<div className="w-full h-full"></div>}>
+                        <EditProfile/>
+                    </Suspense>
+
+                </div>
+
             </div>
 
         );

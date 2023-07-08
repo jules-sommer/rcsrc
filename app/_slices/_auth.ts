@@ -24,7 +24,7 @@ export type authEvent = {
 
 }
 
-const initialState = {
+export const initialState = {
 	value: {
 		id: "",
 		email: "",
@@ -41,8 +41,12 @@ export type User = {
 	id?: String;
 	email: String;
 	name: String;
+	company?: String;
+	researchIntent?: String;
 	roles?: String[];
 	hasCart?: Boolean;
+	cartId?: String;
+	emailVerified?: Boolean | null;
 	isAuthorized?: "authenticated" | "unauthorized" | "loading";
 	expiresAt?: Date;
 

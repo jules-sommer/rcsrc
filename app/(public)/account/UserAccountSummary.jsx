@@ -1,6 +1,5 @@
 "use client"
 
-import { Heading, Badge, Button, TabItem, Tabs, View } from '@aws-amplify/ui-react';
 import { useUserInfo } from '../../_providers/useUserInfo';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { Suspense } from 'react';
@@ -17,7 +16,7 @@ const UserAccountSummary = async () => {
 
     return (
 
-            <View as="main" className='grid grid-cols-5 justify-evenly grid-rows-12 w-9/12 mx-auto py-16 gap-4'>
+            <div as="main" className='grid grid-cols-5 justify-evenly grid-rows-12 w-9/12 mx-auto py-16 gap-4'>
             
                 <div className='flex flex-col w-96 h-min col-span-2 items-center row-auto col-span-1 bg-gradient-to-br from-indigo-950 to-violet-950 border-purple-950 border-2 rounded-2xl shadow-xl shadow-violet-950/50 p-8'>
 
@@ -27,22 +26,22 @@ const UserAccountSummary = async () => {
 
                     <Suspense fallback={<p>Loading user data...</p>}>
 
-                        <Heading level={3} className='text-sky-100 font-mono leading-loose mb-2'></Heading>
-                        <Heading level={6} className='text-sky-100/75 font-mono font-extralight leading-loose'></Heading>
-                        <Heading level={6} className='text-sky-100/75 font-mono font-extralight leading-loose'></Heading>
+                        <h1 level={3} className='text-sky-100 font-mono leading-loose mb-2'></h1>
+                        <h3 level={6} className='text-sky-100/75 font-mono font-extralight leading-loose'></h3>
+                        <h3 level={6} className='text-sky-100/75 font-mono font-extralight leading-loose'></h3>
 
                         <div className='my-6'>
                             {/*user.groups ? user.groups.map((thisRole) => (<Badge variation="info" className='bg-sky-600 text-sky-50' size='large'>{thisRole}</Badge>)) : null*/}
                         </div>
 
-                        <Button
+                        <button
                             variation="primary"
                             size="large"
                             className='mt-4 border-sky-600 border-2 hover:bg-sky-600 font-mono font-light bg-sky-600/30'
                             isFullWidth={true}
-                        >Edit Profile</Button>
+                        >Edit Profile</button>
                         
-                        <Button
+                        <button
                             variation="destructive"
                             size="large"
                             className='mt-4 border-red-600 border-2 font-mono font-light bg-red-600/30'
@@ -50,7 +49,7 @@ const UserAccountSummary = async () => {
                             onClick={() => {
                                 signOut();
                             }}
-                        >Sign Out</Button>
+                        >Sign Out</button>
                         
                     </Suspense>
                     
@@ -58,28 +57,15 @@ const UserAccountSummary = async () => {
 
                 <div className='col-start-3 col-span-3 row-auto w-full h-min p-8 bg-sky-50 rounded-2xl'>
 
-                    <Tabs>
-
-                        <TabItem title={'User Session'}>
-
-                            <Heading level={3} className='font-mono text-slate-900'>userSession:</Heading>
-                            <pre className='font-mono text-slate-800 whitespace-pre-wrap font-bold'>{JSON.stringify(session, undefined, 4)}</pre>
-                            <pre className='font-mono text-slate-800 whitespace-pre-wrap font-bold'>{JSON.stringify(status, undefined, 4)}</pre>
-
-                        </TabItem>
-
-                        <TabItem title={"Auth State (Temp.)"} className='p-6'>
-
-                            <Heading level={3} className='font-mono text-slate-900'>authState:</Heading>
-                            <pre className='font-mono text-slate-800 whitespace-pre-wrap font-bold'>{JSON.stringify(authState, undefined, 4)}</pre>
-
-                        </TabItem>
-
-                    </Tabs>
+                    <div className="tabs tabs-boxed">
+                        <a className="tab">Tab 1</a> 
+                        <a className="tab tab-active">Tab 2</a> 
+                        <a className="tab">Tab 3</a>
+                    </div>
                         
                 </div>
 
-            </View>    
+            </div>    
 
     )
 

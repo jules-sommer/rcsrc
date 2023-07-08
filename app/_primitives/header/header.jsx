@@ -44,11 +44,9 @@ const Header = ({
                     <NavLink href='/molecules'>Molecules</NavLink>
                 </nav>
 
-                
-
                 <div className="grid auto-cols-auto grid-rows-1 grid-flow-col gap-3 shrink-0 justify-end items-center place-content-center">
                     <Suspense>
-                        {showUser ? (<UserHeaderControls />) : null}
+                        {showUser ? ( <UserHeaderControls /> ) : null}
                         {showCart ? ( <HeaderCartIcon /> ) : null}
                     </Suspense>
                 </div>
