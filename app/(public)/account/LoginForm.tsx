@@ -62,21 +62,11 @@ export const LoginForm = async () => {
         console.log(res);
 
         if(res.ok && !res.error) {
-            console.log(res);
 
-            const newUser: User = {
-
-                email: res?.user?.email,
-                name: res?.user?.name,
-                roles: res?.user?.roles
-
-            }
-
-            dispatch(logUserIn(newUser));
             dispatch(setLatestAuthEvent({
                 type: 'signIn',
                 event: {
-                    user: newUser,
+                    user: res,
                 }
             }))
 
