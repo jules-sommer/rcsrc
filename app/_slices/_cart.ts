@@ -1,8 +1,11 @@
+'use client'
+
 import {
 	createSlice,
 	PayloadAction,
 	createReducer,
 } from '@reduxjs/toolkit';
+import { produce } from "immer"
 import { uniqueId } from 'lodash';
 
 type cartState = {

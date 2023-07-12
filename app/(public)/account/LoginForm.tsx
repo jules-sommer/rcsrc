@@ -12,7 +12,8 @@ import googleMark from '/public/google-mark.png';
 
 import { signIn } from 'next-auth/react';
 
-import { logUserIn, setLatestAuthEvent, User } from '../../_slices/_auth';
+import { setLatestAuthEvent, zAuthEvent, AuthEvent } from '../../_slices/_auth';
+import { store } from '../../_store/store';
 import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/navigation';
@@ -25,7 +26,7 @@ export const LoginForm = async () => {
     renderCount++;
 
     const searchParams = useSearchParams();
-    const callbackUrl = searchParams.get("callbackUrl") || "/account";
+    const callbackUrl = searchParams.get("callbackUrl") || "/account?login=success";
 
     const LoginForm = z.object({
         email: z.string().min(1, { message: 'Email is required.' }),
@@ -54,25 +55,22 @@ export const LoginForm = async () => {
 
         console.log(data);
 
+        const dispatched = store.dispatch(setLatestAuthEvent({
+            type: 'magicLinkSent',
+            email: data.email,
+            meta: {
+                timestamp: Date.now(),
+                provider: 'magicLink',
+                message: 'User has been redirected to magic link page and a magic link has been sent.'
+            }
+        } as AuthEvent));
+
+        console.log(`Dispatched: ${JSON.stringify(dispatched)}`);
+        
         const res = await signIn('email', { 
             email: data.email, 
             callbackUrl: 'http://localhost:3000/account' 
         });
-
-        console.log(res);
-
-        if(res.ok && !res.error) {
-
-            dispatch(setLatestAuthEvent({
-                type: 'signIn',
-                event: {
-                    user: res,
-                }
-            }))
-
-        } else {
-            setError("email", { message: "Invalid email or password." });
-        }
 
     }
 
@@ -99,8 +97,21 @@ export const LoginForm = async () => {
 
                 <button
                     className={`${buttonClass} bg-blue-800/25 hover:bg-blue-900/40 `}
-                    onClick={() => signIn("google", { callbackUrl })}
-                >                    
+                    onClick={async () => {
+                    
+                        await signIn("google", { callbackUrl })
+                        
+                        const googleDispatched = store.dispatch(setLatestAuthEvent({
+                            type: 'sentToOAuthProvider',
+                            meta: {
+                                timestamp: Date.now(),
+                                provider: 'magicLink',
+                                message: 'User has been redirected to magic link page and a magic link has been sent.'
+                            }
+                        } as AuthEvent));
+
+                    }}>
+
                     <Image
                         src={googleMark}
                         alt="Google"

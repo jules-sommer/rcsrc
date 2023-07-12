@@ -13,12 +13,17 @@ import Image from 'next/image';
 
 import { setLatestAuthEvent, signUserOut } from "../../_slices/_auth";
 import { useDispatch } from "react-redux";
+import { useIsClient } from '../../_providers/isClientProvider';
 
 const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
 const UserSettingsDropdown = () => {
 
 	const { data: session, status } = useSession();
+	const isClient = useIsClient();
+
+	if (!isClient)
+		return null;
 
 	if (status === 'loading' || status === 'unauthenticated') {
 		

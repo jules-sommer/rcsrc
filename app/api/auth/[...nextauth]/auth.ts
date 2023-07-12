@@ -87,7 +87,17 @@ sessions to the DB ).
 */
         GithubProvider({
             clientId: process.env.GITHUB_ID as string,
-            clientSecret: process.env.GITHUB_SECRET as string
+            clientSecret: process.env.GITHUB_SECRET as string,
+            profile: async (profile, tokens) => {
+                return await profile;
+            }, 
+        }),
+        GoogleProvider({
+            clientId: process.env.GOOGLE_ID as string,
+            clientSecret: process.env.GOOGLE_SECRET as string,
+            profile: async (profile, tokens) => {
+                return await profile;
+            }, 
         }),
         EmailProvider({
             server: {
@@ -150,23 +160,6 @@ sessions to the DB ).
 
                         console.log(typeof result);
                         console.log(chalk.bgGreenBright(JSON.stringify(result.data.fieldsAdded)));
-
-
-                        const latestAuthEvent: AuthEvent = {
-                            type: 'update',
-                            event: {
-                                userId: session.user.id,
-                                fieldsAdded: result.data.fieldsAdded,
-                                newSession: {
-                                    ...session,
-                                    user: result.data.updatedUser
-                                },
-                                time: Date().now()
-
-                            }
-                        }
-
-                        store.dispatch(setLatestAuthEvent(latestAuthEvent));
 
                         return {
                             ...session,

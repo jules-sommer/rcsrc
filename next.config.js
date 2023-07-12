@@ -5,7 +5,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 module.exports = {
 
-  }
+}
 /** @type {import('next').NextConfig} */
 module.exports = withBundleAnalyzer({
 
@@ -20,7 +20,7 @@ module.exports = withBundleAnalyzer({
 
 		appDir: true,
 		serverActions: true,
-		webVitalsAttribution: ['CLS', 'LCP']
+		webVitalsAttribution: ['CLS', 'LCP'],
 
 	},
 	eslint: {

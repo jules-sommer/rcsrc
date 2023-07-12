@@ -1,4 +1,5 @@
 import { withAuth } from "next-auth/middleware"
+import { NextRequest } from "next/server";
 
 export default withAuth(
     // `withAuth` augments your `Request` with the user's token.
@@ -8,7 +9,15 @@ export default withAuth(
     },
     {
         callbacks: {
-            authorized: ({ token }) => token?.role === "admin",
+            authorized: ({ req, token } : { req: NextRequest, token }) => {
+                if(token?.role === "admin") {
+                    return true;
+                } else {
+                    console.log(req)
+                    console.log(token)
+                }
+                
+            }
         },
     }
 )

@@ -3,6 +3,7 @@
 import UserSettingsDropdown from "./UserSettingsDropdown";
 
 import { useUserInfo } from "../../_providers/useUserInfo";
+import { useIsClient } from "../../_providers/isClientProvider";
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/navigation';
 
@@ -38,6 +39,11 @@ const UserHeaderControls = async () => {
 
     const { data: session, status } = useSession();
     const router = useRouter();
+
+    const isClient = useIsClient();
+
+    if (!isClient)
+        return null;
 
     if (status === 'loading')
         return <UserHeaderLoadingSkeleton/>
