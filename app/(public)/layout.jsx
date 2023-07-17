@@ -10,8 +10,10 @@ require('better-logging')(console);
 import CartContextProvider from '../_providers/cartProvider';
 import { ClientProvider, useIsClient } from '../_providers/isClientProvider';
 
+import { JotaiProvider } from '../_providers/JotaiProvider';
+
 import { UseNextAuth } from '../_providers/UseNextAuth';
-import WithReduxState from '../_providers/WithReduxProvider';
+import { ViewSession } from '../_atoms/viewSession';
 
 export const metadata = {
 	title: 'RCSrc Canada',
@@ -26,10 +28,11 @@ const RootLayout = ({ children, cart, ...pageProps }) => {
 
 			<body>
 
-
-				<WithReduxState>
-
+				<JotaiProvider>
+				
 					<UseNextAuth>
+
+						<ViewSession>
 
 						<ClientProvider>
 
@@ -39,7 +42,7 @@ const RootLayout = ({ children, cart, ...pageProps }) => {
 
 								{cart}
 
-								<main className='pt-[86px] bg-slate-950'>{children}</main>
+								<main className='pt-[86px] bg-slate-950' {...pageProps}>{children}</main>
 
 								<Footer />
 								
@@ -47,9 +50,11 @@ const RootLayout = ({ children, cart, ...pageProps }) => {
 
 						</ClientProvider>
 
+						</ViewSession>
+
 					</UseNextAuth>
 
-				</WithReduxState>
+				</JotaiProvider>
 
 			</body>
 	

@@ -1,32 +1,18 @@
-import NextAuth from 'next-auth';
 import type { NextAuthOptions } from "next-auth";
 
-import { NextApiRequest, NextApiResponse } from 'next';
-
-import { MongoDBAdapter } from "@auth/mongodb-adapter"
 import type { MongoDBAdapterOptions } from '@auth/mongodb-adapter';
-import { ObjectId } from 'mongodb';
-
-import nodemailer from 'nodemailer';
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
 
 import clientPromise from '../../../_lib/db';
 
-import Github from 'next-auth/providers/github';
-import GithubProvider from "next-auth/providers/github"
-import GoogleProvider from "next-auth/providers/google"
-import EmailProvider from "next-auth/providers/email"
+import EmailProvider from "next-auth/providers/email";
+import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
 import chalk from 'chalk';
 
-import type { User, AuthEvent } from '../../../_slices/_auth';
-import { store } from '../../../_store/store';
-import { logUserIn, setLatestAuthEvent, signUserOut } from '../../../_slices/_auth';
-
-
+import { User, ObjectIdType } from '../../../_atoms/sessionInitialState';
 import { updateUserById } from '../../../_utils/api';
-import type { User } from '../../../_slices/_auth';
-
-import { uniqueId } from 'lodash';
 
 import type { MongoClient } from 'mongodb';
 
@@ -122,10 +108,8 @@ sessions to the DB ).
             console.log(chalk.bgBlueBright(JSON.stringify(user)));
             console.log(chalk.bgGreenBright(JSON.stringify(account)));
             console.log(chalk.bgWhiteBright(JSON.stringify(profile))); // undefined
-            console.log(chalk.bgMagentaBright(JSON.stringify(email))); // undefined
-            console.log(chalk.bgYellowBright(JSON.stringify(credentials)));
 
-            return true;
+            return { user, account, profile };
 
         },
 
@@ -147,6 +131,11 @@ sessions to the DB ).
         
         session: async({ session, trigger, token, user, newSession }) => {
 
+            if( session.user.id ) {
+                session.user._id = session.user.id as ObjectIdType;
+                delete session.user.id;
+            }
+
             if( trigger === 'update' ) {
 
                 console.log(chalk.bgRedBright('SESSION UPDATE TRIGGERED'));
@@ -154,7 +143,7 @@ sessions to the DB ).
 
                 try {
 
-                    const result = await updateUserById({ id: session.user.id as string, user: newSession as User});
+                    const result = await updateUserById({ _id: session.user.id as string, user: newSession as User });
 
                     if( result.success == true ) {
 
@@ -198,8 +187,58 @@ sessions to the DB ).
 
     },
 
+    events: {
+
+        signIn: async(message) => {
+
+            console.log(`Sign in event`);
+            console.log(message);
+
+        },
+
+        signOut: async(message) => {
+
+            console.log(`Sign out event`);
+            console.log(message);
+
+        },
+
+        createUser: async(message) => {
+            
+            console.log(`Create user event`);
+            console.log(message);
+
+        },
+
+        updateUser: async(message) => {
+
+            console.log(`Update user event`);
+            console.log(message);
+
+        },
+
+        linkAccount: async(message) => {
+            
+            console.log(`Link account event`);
+            console.log(message);
+
+        },
+
+        session: async(message) => {
+
+            console.log(`Session event`);
+            console.log(message);
+
+        },
+
+    },
+
     pages: {
+
         signIn: '/account/login',
+        verifyRequest: '/account/login?verifyRequest=true&provider=magicLink',
+        newUser: '/account/login?onboarding=true'
+        
     },
 
 }

@@ -1,11 +1,7 @@
-// query: { inStock: { $elemMatch: { $eq: true } } }
-
-import { stdout } from "process";
-import { NextResponse } from "next/server";
-import { ObjectId } from "mongodb";
+import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../_lib/db";
 
-export const GET = async (request, context) => {
+export const GET = async (request: NextRequest, context) => {
 
     try {
 
@@ -36,7 +32,7 @@ export const GET = async (request, context) => {
 
         return NextResponse.json({
             success: false,
-            message: `/api/scaffold/${id} errored, probably no match`,
+            message: `/api/scaffold/ errored, probably no match`,
             data: err,
         }, { status: 404 });
 

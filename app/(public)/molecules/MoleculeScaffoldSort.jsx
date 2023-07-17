@@ -16,14 +16,15 @@ let numRenders = 0;
 
 export const Selector = () => {
 
+	numRenders++;
+	
 	const router = useRouter();
 
-	const { data, error, isLoading } = useSWR(`/api/scaffold`, fetcher);
+	const { data, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/scaffold/`, fetcher);
 
 	const [scaffolds, setScaffolds] = useState([]);
 	const [selected, setSelected] = useState();
 
-	numRenders++;
 
 	if(data && !isLoading && !error)
 		console.log(JSON.stringify(data, undefined, 4));

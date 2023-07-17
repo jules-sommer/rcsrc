@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useMemo, useRef } from "react";
-import { useIsClient } from "./isClientProvider";
+import { isClientAtom } from "./isClientProvider";
 import { usePathname, useRouter } from "next/navigation";
+import { useAtomValue } from "jotai";
 
 export const useCartOpen = () => {
 
-    const isClient = useIsClient();
+    const isClient = useAtomValue(isClientAtom);
     const router = useRouter();
     const pathname = usePathname();
 

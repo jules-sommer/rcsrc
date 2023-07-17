@@ -1,32 +1,27 @@
-import { PRODUCT_LIST } from "./molecules.productList"
-import { Selector } from "./MoleculeScaffoldSort"
-import propTypes from "prop-types";
-import Link from "next/link"
-import { headers } from "next/headers";
-import { useSearchParams } from "next/navigation";
-import { NextRequest } from "next/server";
-import { slugify } from "../../_utils/utils";
 import { has } from "lodash";
-import SmilesDrawerContainer from '../../_utils/SmilesDrawerContainer';
-import { MoleculeBadge } from "./MoleculeBadge";
-import { getProductBySlug, getScaffoldByID, getProducts } from "../../_utils/api";
+import { headers } from "next/headers";
+import Link from "next/link";
 import { Suspense } from "react";
+import { SmileDrawerContainer } from "../../_utils/SmilesDrawerContainer";
+import { getProducts, getScaffoldByID, getScaffolds } from "../../_utils/api";
+import { slugify } from "../../_utils/utils";
+import { MoleculeBadge } from "./MoleculeBadge";
+import { Selector } from "./MoleculeScaffoldSort";
 import { MoleculeListSkeleton } from './loading';
 
-const MolListItem = async ({ key, molName, molSMILES, CAS, description, tags = [], scaffoldID, inStock = true }) => {
+const MolListItem = async ({ key, name, smiles, CAS, description, tags = [], scaffoldID, inStock = true }) => {
 
-    const { success, data } = await getScaffoldByID(scaffoldID);
-    let scaffold = null;
+    let { success, scaffold } = await getScaffoldByID(scaffoldID);
 
     if (success)
-        scaffold = data[0];
+        scaffold = scaffold[0];
 
 	return (
 
         <Link
             id={key}
             custom_key={key}
-            href={`/molecules/${slugify(molName)}`}
+            href={`/molecules/${slugify(name)}`}
             aria-disabled={!inStock.value >= 0}
             disabled={!inStock.value >= 0}
             >
@@ -34,7 +29,7 @@ const MolListItem = async ({ key, molName, molSMILES, CAS, description, tags = [
             <div className={`h-64 w-[100%] flex flex-row transition-all hover:origin-center ${inStock ? 'cursor-pointer hover:scale-[1.025]' : 'opacity-75 cursor-default' } bg-gradient-to-t from-indigo-200 via-blue-200 to-sky-200 rounded-2xl`}>
                 <div className='w-64 h-64 flex-shrink-0 rounded-2xl bg-transparent'>
                     <SmilesDrawerContainer
-                        SMILES={molSMILES}
+                        smiles={smiles}
                         height={"100%"}
                         width={"100%"}
                         theme="github"
@@ -45,7 +40,7 @@ const MolListItem = async ({ key, molName, molSMILES, CAS, description, tags = [
 
                     <div className="flex flex-col col-start-1 col-span-3 row-start-1 row-span-1">
 
-                        <h3 className='name whitespace-nowrap text-slate-900 font-mono text-md font-bold'>{molName}</h3>
+                        <h3 className='name whitespace-nowrap text-slate-900 font-mono text-md font-bold'>{name}</h3>
                         <h4 className='font-mono text-sm mb-2'><b>CAS# </b>{CAS}</h4>
                         <p>In Stock: {JSON.stringify(inStock)}</p>
                     
@@ -67,7 +62,6 @@ const MolListItem = async ({ key, molName, molSMILES, CAS, description, tags = [
                             <MoleculeBadge
                                 key={index}
                                 size={'large'}
-                                variation={'info'}
                                 className=""
                             >{thisTag}</MoleculeBadge>
                         ))}
@@ -112,15 +106,15 @@ const ListAllMolecules = async () => {
     else
         filter = {};
     
-    const { success, data } = await getProducts();
-
-    if(!success)
+    const { success: hasProducts, products } = await getProducts();
+    let { success: hasScaffolds, scaffolds } = await getScaffolds(true);
+    
+    console.log(products)
+        
+    if(!hasProducts || !hasScaffolds)
         console.log(error);
     
-    console.log(`Success: ${success}`);
-    console.log(`Data: ${JSON.stringify(data)}`);
-
-   // const pchem_2d_struct = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${slugify(thisProduct.molName).split('-')[0]}/PNG?record_type=2d&image_size=300x300`;
+   // const pchem_2d_struct = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${slugify(thisProduct.name).split('-')[0]}/PNG?record_type=2d&image_size=300x300`;
 
     return (
 
@@ -131,7 +125,7 @@ const ListAllMolecules = async () => {
                 <h1>Our Catalogue</h1>
 
                 <Suspense>
-                    <Selector />
+                    {/*<Selector />*/}
                 </Suspense>
 
             </div>
@@ -140,23 +134,27 @@ const ListAllMolecules = async () => {
 
                 <Suspense fallback={<MoleculeListSkeleton numGridItems={6} />}>
 
-                    {data !== undefined ?
-                        data.map((thisProduct) => (
+                    {products.map((thisProduct) => {
+
+                        const scaffold = scaffolds.filter((thisScaffold) => thisScaffold._id === thisProduct.scaffold);
                         
-                                <MolListItem
-                                    key={thisProduct._id}
-                                    molName={thisProduct.molName}
-                                    CAS={thisProduct.CAS}
-                                    description={thisProduct.description}
-                                    molSMILES={thisProduct.molSMILES}
-                                    tags={thisProduct.tags}
-                                    scaffoldID={has(thisProduct, 'scaffold') ? thisProduct.scaffold : false}
-                                    inStock={has(thisProduct, 'inStock') && thisProduct.inStock.value >= 0 ? true : false}
-                                />
+                        return (
                             
-                            )
-                        ) : null
-                    }
+                            <MolListItem
+                                key={thisProduct._id}
+                                name={thisProduct.name}
+                                CAS={thisProduct.CAS}
+                                description={thisProduct.description}
+                                smiles={thisProduct.smiles}
+                                tags={thisProduct.tags}
+                                scaffoldID={has(thisProduct, 'scaffold') ? thisProduct.scaffold : false}
+                                scaffold={scaffold.length > 0 ? scaffold[0] : null}
+                                inStock={has(thisProduct, 'inStock') && thisProduct.inStock.value >= 0 ? true : false}
+                            />
+                    
+                        );
+
+                    })}
                     
                 </Suspense>
 

@@ -5,7 +5,7 @@ import Header from '../../_primitives/header/header'
 import Footer from '../../_primitives/footer/footer'
 import { LoadingBarWrapper } from '../../_primitives/LoadingBar';
 
-export const MoleculeListSkeleton = (numGridItems = 4) => {
+export const MoleculeListSkeleton = ({ numGridItems = 4 }) => {
 
     let gridItems = [];
 
@@ -41,7 +41,7 @@ export const MoleculeListSkeleton = (numGridItems = 4) => {
 
 }
 
-const LoadingPage = () => {
+const LoadingPage = ({ children }) => {
 
     return (
 
@@ -49,6 +49,8 @@ const LoadingPage = () => {
 
             <LoadingBarWrapper />
         
+            {children}
+
         </main>
         
     )

@@ -2,11 +2,13 @@ import { getProductByIsFeatured } from "../_utils/api";
 import FeaturedCard, { FeatureCardSkeleton } from "../_primitives/featureCard/featureCard";
 import { Suspense } from "react";
 
-const Hero = ({ title, blurb }) => {
+const Hero = ({ title, blurb, theme = 'default' }) => {
+
+    const gradientWithTheme = 'bg-gradient-to-tl from-slate-950 via-indigo-950 to-cyan-950';
 
     return (
 
-        <section className="bg-gradient-to-tl py-24 from-slate-950 via-indigo-950 to-cyan-950">
+        <section className={`${gradientWithTheme} p-24`}>
 
             <div className="font-sans w-9/12 mx-auto flex">
 
@@ -38,25 +40,23 @@ const FeaturedProductsSkeleton = () => {
 
 const Home = async () => {
 
-    const { success, data } = await getProductByIsFeatured(true);
-
-    if(success)
-        console.log(data);
+    let { success, data } = await getProductByIsFeatured(true);
 
     return (
             
         <>
 
-            <Hero 
+            <Hero
                 title={(<><h1 className="text-4xl mb-6 font-mono tracking-tight">Making the novel accessible;</h1><h3 className="text-2xl font-sans font-extralight text-sky-100/80 tracking-wide">advancing research in organic synthesis, molecular & biological discovery.</h3></>)}
                 blurb={(<p>RCSrc Canada is a Canadian research chemical supplier with owners and staff who are passionate about novel APIs, the synthesis thereof, and uncovering fascinating structure-activity relationships to benefit the field of organic chemistry, pharmacology, and synthesis. We are dedicated to bringing Canadian researchers a range of novel compounds covering research areas and receptor-binding profiles often overlooked - allowing researchers a chance to continue to advance their discovery.</p>)}
-                />
+                theme="lsd"
+            />
 
-			<section className='featuredItems bg-slate-950 h-auto pt-24 pb-16'>
+            <section className='featuredItems bg-slate-950 h-auto pt-24 pb-16'>
 
-				<div className='title w-9/12 mx-auto mb-16'>
-					<h1 className='text-sky-100 text-4xl font-mono'>Featured Compounds</h1>
-				</div>
+                <div className='title w-9/12 mx-auto mb-16'>
+                    <h1 className='text-sky-100 text-4xl font-mono'>Featured Compounds</h1>
+                </div>
 
                 <div class="w-[100%] px-12 grid grid-cols-4 grid-rows-1 grid-flow-col gap-4">
                     
@@ -65,19 +65,15 @@ const Home = async () => {
                         {data.map((product) => (
                             <FeaturedCard
                                 key={product._id}
-                                molName={product.molName}
-                                CAS={product.CAS}
-                                iupac={product.iupac}
-                                molSMILES={product.molSMILES}
-                                description={product.description}
+                                {...product}
                             />
                         ))}
 
                     </Suspense>
                         
-				</div>
+                </div>
 
-			</section>
+            </section>
 
         </>
 

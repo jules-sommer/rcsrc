@@ -63,3 +63,5 @@ amplifytools.xcconfig
 aws-exports.js
 /amplify/team-provider-info.json
 #amplify-do-not-edit-end
+.env.json
+_swc_error_jotai_nextjs.txt

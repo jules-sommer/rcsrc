@@ -1,7 +1,10 @@
 import sanitize from 'mongo-sanitize';
 import { ObjectId } from 'mongodb';
 import { toString } from 'lodash';
-import type { User } from '../_slices/_auth';
+import { Session, getServerSession } from 'next-auth';
+import { authOptions } from '../api/auth/[...nextauth]/auth'; 
+import { zUser, User, ObjectIdType } from '../_atoms/userAtom';
+import { headers } from 'next/headers';
 
 export interface OrderingOptions {
 
@@ -36,7 +39,7 @@ export const getProductByScaffold = async (scaffold: ObjectId) => {
 
 export const getProductByIsFeatured = async (isFeatured: Boolean, limit = 4) => {
 
-    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/isFeatured/${isFeatured}?limit=${limit}`, { next: { revalidate: 7200 } });
+    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/isFeatured/${isFeatured}?limit=${limit}`, { next: { revalidate: 60 * 60 } });
     const result = await raw.json();
     
     return result;
@@ -104,17 +107,55 @@ export const getProductBySlug = async (molSlug: String) => {
     }
 
     const result = await raw.json();
-
     return result;
 
 }
 
 export const getProducts = async () => {
 
-    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/`);
-    const result = await raw.json();
+    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/`, { next: { revalidate: 60 * 60 } }); // Revalidate every 1hr or 3600s
 
-    return result;
+    // destructure with new, unique syntax so that we can use multiple API routes in a single component later
+    const { success, data: products } = await raw.json();
+
+    return { success, products };
+
+}
+
+export const getScaffolds = async ( shouldGetProducts = false ) => {
+
+    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scaffold/`, { next: { revalidate: 60 * 60 } });  // Revalidate every 1hr or 3600s
+
+    // destructure with new, unique syntax so that we can use multiple API routes in a single component later
+    let { success: hasScaffolds, data: scaffolds } = await raw.json();
+    
+    if( shouldGetProducts ) {
+        
+        let { success: hasProducts, products } = await getProducts(); 
+
+        if( hasProducts && hasScaffolds ) {
+
+            scaffolds = scaffolds.map((scaffold) => {
+
+                scaffold.products = [];
+
+                products.map((product) => {
+
+                    if( scaffold._id === product.scaffold ) {
+                        scaffold.products.push(product);
+                    }
+
+                });
+
+                return scaffold;
+
+            })
+
+        }
+
+    }
+
+    return { success: hasScaffolds, scaffolds };
 
 }
 
@@ -124,26 +165,55 @@ export const getScaffoldByID = async ({ id = '' } : { id: string }) => {
     let cleanId = sanitize(id);
 
     const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scaffold${id !== '' ? '/'+cleanId : null}`)
-    const result = await raw.json();
+    const { success, data: scaffold } = await raw.json();
 
-    return result;
+    return { success, scaffold };
 
 }
 
-export const updateUserById = async ({ id, user } : { id: string, user: User }) => {
+/*
+*   TODO: Protect these user endpoints so that only an authenticated user can update their profile, etc.
+*   
+*/
 
-    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/update/${id}`, {
+export const updateUserById = async ({ _id, user } : { _id: ObjectIdType, user: User }) => {
+
+    _id = sanitize(_id);
+
+    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/update/${_id}`, {
         method: 'POST',
         body: JSON.stringify(user),
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
+        headers: headers(),
     });
 
     const result = await raw.json();
 
     return result;
 
+}
+
+export const getSession = async () => {
+
+    const session = await getServerSession(authOptions) as Session;
+
+    if( session )
+        return { ...session };
+    else
+        return { user: null };
+
+}
+
+export const getUserByEmail = async ({ email, prefetch = false } : { email: String, prefetch: Boolean }) => {
+
+    let cleanEmail = sanitize(email);
+    const session = await getServerSession();
+
+    if( session.user.email !== email && !prefetch )
+        throw new Error(`You are not authenticated as user ${email}...`);
+
+    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/email/${email}`)
+    const result = await raw.json();
+
+    return result;
 
 }

@@ -3,7 +3,7 @@
 import React, { createRef, useEffect, useRef } from "react";
 import SmilesDrawer from "smiles-drawer";
 
-const SmileDrawerContainer = ({ SMILES, theme='dark', height, width, className }) => {
+export const SmileDrawerContainer = ({ smiles, theme='github', height = '256px', width = '256px', className }) => {
 
     const canvasRef = useRef();
 
@@ -219,16 +219,14 @@ const SmileDrawerContainer = ({ SMILES, theme='dark', height, width, className }
     
     useEffect(() => {
         
-        drawer.draw(SMILES, imgRef.current, theme);
+        drawer.draw(smiles, imgRef.current, theme);
 
     }, []);
 
 
     return (
-        <div className={className}>
+        <div className={`${className} min-h-[${height}] min-w-[${width}]`}>
             <img ref={imgRef} className="w-full"/>
         </div>
     );
 };
-
-export default SmileDrawerContainer;

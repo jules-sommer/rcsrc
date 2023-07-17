@@ -3,30 +3,24 @@
 import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import Link from 'next/link';
-import { useUserInfo } from '../../_providers/useUserInfo'
 import { slugify } from '../../_utils/utils';
-
-import { signIn, signOut } from 'next-auth/react';
-import { useSession } from 'next-auth/react'
 
 import Image from 'next/image';
 
-import { setLatestAuthEvent, signUserOut } from "../../_slices/_auth";
-import { useDispatch } from "react-redux";
-import { useIsClient } from '../../_providers/isClientProvider';
+import { isClientAtom } from '../../_providers/isClientProvider';
+import { useAtomValue, useAtom } from 'jotai';
+
+import { useUserData } from '../../_providers/JotaiProvider'
 
 const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
 const UserSettingsDropdown = () => {
 
-	const { data: session, status } = useSession();
-	const isClient = useIsClient();
+    const { authenticated, user } = useUserData();
+	const isClient = useAtomValue(isClientAtom);
 
-	if (!isClient)
-		return null;
+	if (!isClient || !authenticated) {
 
-	if (status === 'loading' || status === 'unauthenticated') {
-		
 		return null;
 
 	} else {
@@ -40,10 +34,11 @@ const UserSettingsDropdown = () => {
 					<Menu.Button className="inline-flex items-center justify-center flex-grow-0 mr-3">
 
 						<Image
-							src={`https://api.dicebear.com/6.x/bottts/png?seed=${slugify(session.user.email.split('@')[0])}}`}
+							src={`https://api.dicebear.com/6.x/bottts/png?seed=${slugify(user.email.split('@')[0])}}`}
 							width={50}
 							height={50}
 							className='mask mask-hexagon bg-accent mx-4 opacity-75 hover:opacity-100 hover:transform hover:scale-110 transition-all duration-200 ease-in-out'
+							alt={''}
 						/>
 								
 					</Menu.Button>
@@ -86,12 +81,7 @@ const UserSettingsDropdown = () => {
 								{({ active }) => (
 									<button
 										onClick={() => {
-											signOut();
-											useDispatch(signUserOut());
-											useDispatch(setLatestAuthEvent({
-												type: 'signOut',
-												timestamp: Date.now(),
-											}))
+											signOut({ callbackUrl: '/' })
 										}}
 										className={classNames(
 											active ? 'bg-red-200 text-red-900' : 'text-red-700',

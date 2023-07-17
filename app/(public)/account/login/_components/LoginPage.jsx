@@ -1,8 +1,10 @@
 import Image from 'next/image';
 import { LoginForm } from './LoginForm';
-import Logo from '../../_primitives/Logo';
+import Logo from '../../../../_primitives/Logo';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../../../api/auth/[...nextauth]/auth';
 
 export const SignUp = () => {
 
@@ -12,7 +14,7 @@ export const SignUp = () => {
 
 export const Login = () => {
 
-    let formState;
+    const session = getServerSession(authOptions);
 
     return (
     
@@ -30,7 +32,7 @@ export const Login = () => {
                 <div className="mt-3 flex flex-col items-center justify-center sm:mx-auto sm:w-full sm:max-w-sm">
                     
                     <Suspense fallback={<p>Loading login form...</p>}>
-                        <LoginForm />
+                        <LoginForm {...session} />
                     </Suspense>
                         
                     <p className="mt-10 text-center text-sm text-slate-400">Not a member?{' '}

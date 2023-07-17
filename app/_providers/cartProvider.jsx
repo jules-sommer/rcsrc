@@ -9,8 +9,9 @@ import {
 	createContext, useReducer, useEffect, useMemo,
 } from 'react';
 
-import { useIsClient } from './isClientProvider';
+import { isClientAtom } from './isClientProvider';
 import { usePathname, useRouter } from 'next/navigation';
+import { useAtomValue } from 'jotai';
 
 export const CartStateContext = createContext(null);
 export const CartDispatchContext = createContext(null);
@@ -19,7 +20,7 @@ const CartContextProvider = ({ children }) => {
 
 	const pathname = usePathname();
 	const router = useRouter();
-	const isClient = useIsClient();
+	const isClient = useAtomValue(isClientAtom);
 
 	const cartReducer = (state, action) => {
 

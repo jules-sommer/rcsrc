@@ -7,15 +7,16 @@ import { useContext } from 'react';
 import NavLink from '../navLink';
 import { usePathname, useRouter } from 'next/navigation';
 import { CartStateContext, CartDispatchContext } from '../../_providers/cartProvider';
-import { useIsClient } from '../../_providers/isClientProvider';
+import { isClientAtom } from '../../_providers/isClientProvider';
 import { useCartOpen } from '../../_providers/useCartOpen';
+import { useAtomValue } from 'jotai';
 
 const HeaderCartIcon = () => {
 
 	const state = useContext(CartStateContext);
 	const dispatch = useContext(CartDispatchContext);
 	
-	const isClient = useIsClient();
+	const isClient = useAtomValue(isClientAtom);
 	const isOpen = useCartOpen();
 
 	const router = useRouter();

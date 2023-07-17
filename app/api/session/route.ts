@@ -8,7 +8,11 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     if (!session) {
         return new NextResponse(
-            JSON.stringify({ status: "fail", message: "You are not logged in" }),
+            JSON.stringify({
+                authenticated: !!session,
+                session: null,
+                message: "401: Unauthorized, you are not logged in.",
+            }),
             { status: 401 }
         );
     }
@@ -16,6 +20,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
     return NextResponse.json({
         authenticated: !!session,
         session,
-    });
+    }, { status: 200 });
 
 }

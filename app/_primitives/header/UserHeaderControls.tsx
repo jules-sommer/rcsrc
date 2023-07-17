@@ -2,10 +2,10 @@
 
 import UserSettingsDropdown from "./UserSettingsDropdown";
 
-import { useUserInfo } from "../../_providers/useUserInfo";
-import { useIsClient } from "../../_providers/isClientProvider";
-import { useSession } from "next-auth/react";
+import { isClientAtom } from "../../_providers/isClientProvider";
+import { asyncSessionAtom, UserSession, isAuthenticatedAtom, signOutAtom, sessionAtom, asyncFetchSession, useUserData } from "../../_providers/JotaiProvider";
 import { useRouter } from 'next/navigation';
+import { Atom, useAtom, useAtomValue } from "jotai";
 
 const Badge = ({ children, variation, size, className }) => {
 
@@ -35,31 +35,31 @@ const UserHeaderLoadingSkeleton = () => (
 
 );
 
-const UserHeaderControls = async () => {
+const UserHeaderControls = () => {
 
-    const { data: session, status } = useSession();
+    const { authenticated, user } = useUserData();
+
+    const [, signOut] = useAtom(signOutAtom);
+
     const router = useRouter();
 
-    const isClient = useIsClient();
+    const isClient = useAtomValue(isClientAtom);
 
-    if (!isClient)
+    if (!isClient || !authenticated)
         return null;
 
-    if (status === 'loading')
-        return <UserHeaderLoadingSkeleton/>
-
-    if (status === 'authenticated') {
+    if(  authenticated == true ) {
     
-        let hasName = session.user.name ? true : false;
+        let hasName = user.name ? true : false;
 
         return (
         
             <div className="flex flex-row">
-    
+
                 <div className='flex flex-col items-end justify-center leading-tight'>
-                    <p className="block text-sky-100 font-medium font-mono text-s">{hasName ? session.user.name : session.user.email}</p>
+                    <p className="block text-sky-100 font-medium font-mono text-s">{hasName ? user.name : user.email}</p>
                     <div className="flex flex-row">
-                        {session.user.roles ? session.user.roles.map((thisGroup) => (
+                        {user.roles ? user.roles.map((thisGroup) => (
                             <span className={`
                             text-md px-2 py-1 my-1 mx-[2px] bg-gradient-to-tr from-sky-400/25 to-cyan-950 rounded-full border-[1px] border-cyan-700
                             items-center justify-center inline-flex mr-1 whitespace-nowrap w-min flex-shrink flex-grow-0 h-min
@@ -67,40 +67,36 @@ const UserHeaderControls = async () => {
                         )) : null}
                     </div>
                 </div>
-    
+
                 <UserSettingsDropdown />
-    
+
             </div>
-    
+
         )
 
-    } else {
-        
-        return (
-
-            <div className="flex flex-row">
-
-                <button
-                    variation={'default'}
-                    onClick={() => {
-                        router.push('/account/login')
-                    }}
-                    size="small"
-                    className="font-mono inline-flex text-sky-200 rounded-md px-2 py-2 border-[1px] border-sky-300/50 hover:border-sky-600/75 hover:bg-sky-900/50"
-                >
-                    <span className='material-symbols-rounded p-0'>
-                        login
-                    </span>
-                    <span class="ml-2">
-                        Login
-                    </span>
-                </button>
-
-            </div>
-
-        );
-
     }
+    
+    return (
+
+        <div className="flex flex-row">
+
+            <button
+                onClick={() => {
+                    router.push('/account/login')
+                }}
+                className="font-mono inline-flex text-sky-200 rounded-md px-2 py-2 border-[1px] border-sky-300/50 hover:border-sky-600/75 hover:bg-sky-900/50"
+            >
+                <span className='material-symbols-rounded p-0'>
+                    login
+                </span>
+                <span className="ml-2">
+                    Login
+                </span>
+            </button>
+
+        </div>
+
+    );
 
 }
 

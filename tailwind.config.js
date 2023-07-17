@@ -12,8 +12,21 @@ module.exports = {
           'drop-shadow(0 20px 13px rgba(125, 211, 252, 0.5)))',
           'drop-shadow(0 8px 5px rgba(125, 211, 252, 0.05))'
         ]
-      }
-    }
+      },
+      colors: {
+        'pinkola': {
+          100: "#ffdde2",
+          200: "#ffbbc4",
+          300: "#ff98a7",
+          400: "#ff7689",
+          500: "#ff546c",
+          600: "#cc4356",
+          700: "#993241",
+          800: "#66222b",
+          900: "#331116"
+        }
+      },
+    },
   },
   daisyui: {
     themes: [
@@ -26,7 +39,7 @@ module.exports = {
           "base-100": "#1d1a48",
           "info": "#5fb8e7",
           "success": "#139a7b",
-          "warning": "#af760e",
+          "warning": "#f1a821",
           "error": "#dc3848",
         },
       },
@@ -38,6 +51,7 @@ module.exports = {
     ],
   },
   plugins: [
+    require('@tailwindcss/container-queries'),
     require('@headlessui/tailwindcss'),
     require('@tailwindcss/forms'),
     require('@tailwindcss/typography'),
