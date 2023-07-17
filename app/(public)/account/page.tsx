@@ -2,18 +2,17 @@ import { AccountControls } from './profile/_components/AccountControls';
 import { headers, cookies } from 'next/headers'
 import _ from 'lodash'
 import chalk from 'chalk'
-import UserAccountSummary from './UserAccountSummary'
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../api/auth/[...nextauth]/auth';
-import { EditProfile } from './profile/ProfileMain'
+import { EditProfile } from './profile/EditProfileWrapper'
 import Image from 'next/image'
 import { slugify } from '../../_utils/utils'
 import { Suspense } from 'react'
 import type { Session } from 'next-auth'
 import { updateUserById } from '../../_lib/updateUserById'
-import { UserSession } from '../../_atoms/sessionInitialState';
 import { revalidatePath } from 'next/cache'
+import { EditProfileWrapper } from './profile/EditProfileWrapper'
 
 const updateUser = async (data: UserSession) => {
     'use server'
@@ -96,7 +95,7 @@ const Account = async (request, context) => {
                     flex flex-col col-span-4 flex-grow`}>
 
                     <Suspense fallback={<div className="w-full h-full"></div>}>
-                        <EditProfile serverSession={session} updateUser={updateUser} />
+                        <EditProfileWrapper serverSession={session} updateUser={updateUser} />
                     </Suspense>
 
                 </div>

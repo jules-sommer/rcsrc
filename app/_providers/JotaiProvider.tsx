@@ -6,6 +6,8 @@ import { v4 as uuid } from 'uuid';
 import { atom } from "jotai";
 import { loadable } from "jotai/utils";
 import { signOut } from "next-auth/react";
+import { focusAtom } from "jotai-optics";
+import { useRef } from "react";
 
 /*
 *   CREATE JOTAI STORE
@@ -121,17 +123,34 @@ export const asyncFetchSession = atom(
 
 export const asyncSessionAtom = loadable(asyncFetchSession)
 
+export const SessionInitialize = ({ session } : { session: UserSession }) => {
+
+    const initialized = useRef(false);
+
+    if (!initialized.current) {
+        RCStore.set(sessionAtom, session);
+        initialized.current = true;
+    }
+
+    return null;
+
+}
+
 export const useUserData = () => {
 
+    const hasInitialized = useRef(false);
     const { state, data } = useAtomValue(asyncSessionAtom);
 
-    if (state !== "hasData" || !data.session)
+    if (state !== "hasData" || !data.session) {
+        hasInitialized.current = true;
         return {
             authenticated: false,
             user: null,
         }
+    }
 
     const { authenticated, session: { user } } = data;
+    hasInitialized.current = true;
 
     return {
         authenticated,
@@ -145,12 +164,14 @@ export const sessionStorageAtom = atom(JSON.parse(localStorage.getItem('session'
 
 export const isAuthenticatedAtom = atom(
 	(get) => {
-		const { authenticated, session, message } 
-            : { authenticated: boolean, session: UserSession, message?: string }
-            = get<any>(asyncFetchSession);
 
-		if( authenticated ) return true;
-		return false;
+        const session = get(sessionStorageAtom);
+
+        if( session )
+            return session.user._id ? true : false;
+		
+        return false;
+
 	}
 )
 
@@ -193,6 +214,58 @@ export const userEmailAtom = atom(
 		})
 	}
 );
+
+/*
+*   JOTAI CART ATOMS
+*/
+
+export const zCartItem = z.object({
+    _id: z.string().default(uuid()),
+    product: z.string(),
+    configuration: z.object({
+        format: z.union([
+            z.literal("powder"),
+            z.literal("solution"),
+        ]),
+        solvent: zObjectId.optional(),
+        concentration: z.object({
+            value: z.number().min(0).max(100).optional(),
+            unit: z.union([
+                z.literal("mg/mL"),
+                z.literal("ug/mL"),,
+                z.literal("mg/L")
+            ]).optional(),
+        }).optional(),
+        container: zObjectId.optional(),
+        quantity: z.number().min(1).max(10000).default(1),
+    }),
+    createdAt: zUnixTime.optional(),
+    updatedAt: zUnixTime.optional(),
+});
+
+export type CartItem = z.infer<typeof zCartItem>;
+
+export const zCart = z.object({
+    _id: z.string().default(uuid()),
+    user: zObjectId,
+    items: z.array(zCartItem),
+    total: z.number().min(0).max(1000000).default(0),
+    createdAt: zUnixTime.optional(),
+    updatedAt: zUnixTime.optional(),
+});
+
+export type Cart = z.infer<typeof zCart>;
+
+export const cartAtom = atom({
+    _id: "" as uuid,
+    user: "" as ObjectIdType,
+    items: [] as CartItem[],
+    total: 0 as number,
+    createdAt: 0 as UnixTime,
+    updatedAt: 0 as UnixTime,
+} as Cart);
+
+export const totalAtom = focusAtom(cartAtom, (optic) => optic.prop("total"));
 
 /*
 *   EXPORT JOTAI PROVIDER WRAPPER

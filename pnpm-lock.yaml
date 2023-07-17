@@ -116,6 +116,9 @@ dependencies:
   nodemon:
     specifier: ^3.0.1
     version: 3.0.1
+  optics-ts:
+    specifier: ^2.4.1
+    version: 2.4.1
   react:
     specifier: ^18.2.0
     version: 18.2.0

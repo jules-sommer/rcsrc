@@ -46,6 +46,7 @@
     "next-typesafe-url": "^3.1.0",
     "nodemailer": "^6.9.3",
     "nodemon": "^3.0.1",
+    "optics-ts": "^2.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.45.1",

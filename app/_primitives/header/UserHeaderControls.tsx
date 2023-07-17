@@ -45,10 +45,10 @@ const UserHeaderControls = () => {
 
     const isClient = useAtomValue(isClientAtom);
 
-    if (!isClient || !authenticated)
+    if (!isClient)
         return null;
 
-    if(  authenticated == true ) {
+    if( authenticated == true ) {
     
         let hasName = user.name ? true : false;
 
@@ -74,29 +74,31 @@ const UserHeaderControls = () => {
 
         )
 
-    }
+    } else {
     
-    return (
+        return (
 
-        <div className="flex flex-row">
+            <div className="flex flex-row">
 
-            <button
-                onClick={() => {
-                    router.push('/account/login')
-                }}
-                className="font-mono inline-flex text-sky-200 rounded-md px-2 py-2 border-[1px] border-sky-300/50 hover:border-sky-600/75 hover:bg-sky-900/50"
-            >
-                <span className='material-symbols-rounded p-0'>
-                    login
-                </span>
-                <span className="ml-2">
-                    Login
-                </span>
-            </button>
+                <button
+                    onClick={() => {
+                        router.push('/account/login')
+                    }}
+                    className="font-mono inline-flex text-sky-200 rounded-md px-2 py-2 border-[1px] border-sky-300/50 hover:border-sky-600/75 hover:bg-sky-900/50"
+                >
+                    <span className='material-symbols-rounded p-0'>
+                        login
+                    </span>
+                    <span className="ml-2">
+                        Login
+                    </span>
+                </button>
 
-        </div>
+            </div>
 
-    );
+        );
+
+    }
 
 }
 

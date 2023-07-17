@@ -14,6 +14,7 @@ import { JotaiProvider } from '../_providers/JotaiProvider';
 
 import { UseNextAuth } from '../_providers/UseNextAuth';
 import { ViewSession } from '../_atoms/viewSession';
+import { SessionInitializeWrapper } from '../_providers/SessionInitializeWrapper';
 
 export const metadata = {
 	title: 'RCSrc Canada',
@@ -32,23 +33,25 @@ const RootLayout = ({ children, cart, ...pageProps }) => {
 				
 					<UseNextAuth>
 
+						<SessionInitializeWrapper />
+
 						<ViewSession>
 
-						<ClientProvider>
+							<ClientProvider>
 
-							<CartContextProvider>
+								<CartContextProvider>
 
-								<Header />
+									<Header />
 
-								{cart}
+									{cart}
 
-								<main className='pt-[86px] bg-slate-950' {...pageProps}>{children}</main>
+									<main className='pt-[86px] bg-slate-950' {...pageProps}>{children}</main>
 
-								<Footer />
-								
-							</CartContextProvider>
+									<Footer />
+									
+								</CartContextProvider>
 
-						</ClientProvider>
+							</ClientProvider>
 
 						</ViewSession>
 
