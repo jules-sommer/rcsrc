@@ -1,20 +1,21 @@
 'use client'
 
 import {
-	createContext, useEffect, useContext, useState
+    useEffect
 } from 'react';
 
-const ClientContext = createContext(false);
+import { atom, useAtom } from 'jotai';
+
+export const isClientAtom = atom(false);
 
 export const ClientProvider = ({ children }) => {
     
-    const [isClient, setIsClient] = useState(false);
-    useEffect(() => setIsClient(true), []);
+    const [_, setIsClient] = useAtom(isClientAtom);
 
-    return <ClientContext.Provider value={isClient}>{children}</ClientContext.Provider>
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
-};
+    return children;
 
-export const useIsClient = () => {
-    return useContext(ClientContext);
 };

@@ -1,4 +1,4 @@
-const productOptionRadioSelector = ({  }) => {
+const productOptionRadioSelector = () => {
 
     return (
 

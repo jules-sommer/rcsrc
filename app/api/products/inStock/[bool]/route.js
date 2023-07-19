@@ -1,7 +1,7 @@
 // query: { inStock: { $elemMatch: { $eq: true } } }
 
 import { stdout } from "process";
-import clientPromise from "../../../../_utils/db"
+import clientPromise from '../../../../_lib/db'
 import { NextResponse } from "next/server";
 import { toNumber } from "lodash";
 

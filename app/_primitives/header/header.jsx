@@ -2,8 +2,9 @@ import NavLink from "../navLink"
 import Logo from "../Logo"
 import Link from "next/link"
 import HeaderCartIcon from './headerCartIcon';
-import UserHeaderControls from "./UserHeaderControls";
 import { Suspense } from "react";
+
+import { AccountDropdown } from "./AccountDropdown";
 
 const Header = ({
 
@@ -43,11 +44,9 @@ const Header = ({
                     <NavLink href='/molecules'>Molecules</NavLink>
                 </nav>
 
-                
-
                 <div className="grid auto-cols-auto grid-rows-1 grid-flow-col gap-3 shrink-0 justify-end items-center place-content-center">
                     <Suspense>
-                        {showUser ? (<UserHeaderControls />) : null}
+                        {showUser ? ( <AccountDropdown /> ) : null}
                         {showCart ? ( <HeaderCartIcon /> ) : null}
                     </Suspense>
                 </div>

@@ -4,6 +4,7 @@ import { stdout } from "process";
 import { getMongoClient } from "../../../_utils/db";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
+import clientPromise from "../../../_lib/db";
 
 export const GET = async (request, context) => {
 
@@ -13,7 +14,7 @@ export const GET = async (request, context) => {
     try {
 
         // grab mongo client and find our collection
-        const client = await getMongoClient()
+        const client = await clientPromise;
         const coll = client.db('data').collection('scaffolds');
 
         const filter = {

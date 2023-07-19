@@ -16,5 +16,8 @@ module.exports = {
     'plugins': [
         new LodashModuleReplacementPlugin,
         new webpack.optimize.UglifyJsPlugin
-    ]
+    ],
+    externals: {
+        bitwarden: "@bitwarden/sdk-napi"
+    }
 };

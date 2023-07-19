@@ -1,8 +1,4 @@
-import { Auth, withSSRContext } from 'aws-amplify';
-import AuthenticatorWrapper from '../../_providers/AuthenticatorWrapper';
 import { headers, cookies } from 'next/headers'
-import awsExports from '../../aws-exports';
-import { Amplify } from 'aws-amplify'
 
 
 const Dashboard = async (request, context) => {

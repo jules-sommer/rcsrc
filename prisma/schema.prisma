@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
+}
+
+model Cart {
+  id        String      @unique @db.Uuid @default(uuid())
+  userId    String
+  items     CartItem[]  
+  total     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Product {
+  id             String       @unique @db.Uuid @default(uuid())
+  name           String       @unique
+  CartItems      CartItem[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  CAS            String
+  iupac          String
+  smiles         String
+  formula        String
+  scaffold       Scaffold     @relation(fields: [scaffoldId], references: [id])
+  scaffoldId     String       @db.Uuid
+}
+
+model CartItem {
+  id              String      @unique @db.Uuid @default(uuid())
+  Cart            Cart        @relation(fields: [cartId], references: [id])
+  cartId          String      @db.Uuid  @unique
+  product         Product     @relation(fields: [productId], references: [id])
+  productId       String      @db.Uuid
+  configuration   Json        @db.Json
+  quantity        Int
+  quantityUnit    String
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Scaffold  {
+  id             String       @unique @db.Uuid @default(uuid())
+  name           String       @unique
+  products       Product[]
+  iupac          String
+  smiles         String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}

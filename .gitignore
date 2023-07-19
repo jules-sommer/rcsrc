@@ -48,7 +48,9 @@ amplify/backend/amplify-meta.json
 amplify/backend/.temp
 build/
 dist/
+amplify/
 aws-exports.js
+aws-exports.ts
 node_modules/
 awsconfiguration.json
 amplifyconfiguration.json
@@ -58,4 +60,12 @@ amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
 **.sample
+aws-exports.js
+/amplify/team-provider-info.json
 #amplify-do-not-edit-end
+.env.json
+_swc_error_jotai_nextjs.txt
+.env
+.env.development
+.env
+.env.development
