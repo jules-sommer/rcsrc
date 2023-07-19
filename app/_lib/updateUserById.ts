@@ -1,9 +1,10 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/auth";
-import { ObjectIdType, User, UserSession } from '../_atoms/sessionInitialState';
+import { ObjectIdType, User, UserSession } from "../_atoms/userAtom";
 import { Session } from "next-auth";
 import clientPromise from "./db";
 import { ObjectId } from "mongodb";
+import { toString } from 'lodash'
 
 export const updateUserById = async ({ _id, user } : { _id: ObjectIdType, user: User }) => {
 
@@ -37,10 +38,15 @@ export const updateUserById = async ({ _id, user } : { _id: ObjectIdType, user: 
 
     // sanitize the user object from an ID so that we don't accidentally update the ID of this user and cause an error
 
+    console.log(user);
+
     if( user.id )
         delete user.id;
     else if ( user._id )
         delete user._id
+
+    console.log(user);
+
 
     try {
 

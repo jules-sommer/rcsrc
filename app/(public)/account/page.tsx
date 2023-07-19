@@ -13,14 +13,20 @@ import type { Session } from 'next-auth'
 import { updateUserById } from '../../_lib/updateUserById'
 import { revalidatePath } from 'next/cache'
 import { EditProfileWrapper } from './profile/EditProfileWrapper'
+import { ObjectIdType, UserSession } from '../../_providers/JotaiProvider';
 
-const updateUser = async (data: UserSession) => {
+import { PrismaClient } from '@prisma/client'
+
+const updateUser = async (id: ObjectIdType, user: UserSession) => {
     'use server'
 
-    console.log(data);
+    console.log(id);
+    console.log(user);
 
-    const { user } = data;
-    const { id } = user;
+    if( user.id )
+        delete user.id
+    else if( user._id )
+        delete user._id
 
     const raw = await updateUserById({ _id: id, user: user });
 
@@ -38,14 +44,15 @@ const updateUser = async (data: UserSession) => {
 
 const Account = async (request, context) => {
 
-    const session = await getServerSession(authOptions) as UserSession;
+    const prisma = new PrismaClient()
+    const { user } = await getServerSession(authOptions) as UserSession;
 
-    if (session) {
+    if (user) {
 
-        let hasName = session.user.name ? true : false;
-        let hasRoles = session.user.roles ? true : false;
-        let hasCompany = session.user.company ? true : false;
-        let hasEmail = session.user.email ? true : false;
+        let hasName = user.name ? true : false;
+        let hasRoles = user.roles ? true : false;
+        let hasCompany = user.company ? true : false;
+        let hasEmail = user.email ? true : false;
         
         return (
 
@@ -57,7 +64,7 @@ const Account = async (request, context) => {
                     border-2 border-cyan-800 rounded-3xl`}>
 
                     <Image
-                        src={`https://api.dicebear.com/6.x/bottts/png?seed=${slugify(session.user.email.split('@')[0])}}`}
+                        src={`https://api.dicebear.com/6.x/bottts/png?seed=${slugify(user.email.split('@')[0])}}`}
                         width={100}
                         alt='User Avatar'
                         height={100}
@@ -65,16 +72,16 @@ const Account = async (request, context) => {
                     />
 
                     <div className='text-sky-100 flex flex-col items-center justify-center text-center prose'>
-                        {hasName ? (<h1 className='font-bold mb-6 my-5'>{session.user.name}</h1>) : null}
-                        {hasCompany ? (<h3 className='font-semibold my-0'>{session.user.company}</h3>) : null}
-                        {hasEmail ? (<h3 className='my-0 font-light'>{session.user.email}</h3>) : null}
+                        {hasName ? (<h1 className='font-bold mb-6 my-5'>{user.name}</h1>) : null}
+                        {hasCompany ? (<h3 className='font-semibold my-0'>{user.company}</h3>) : null}
+                        {hasEmail ? (<h3 className='my-0 font-light'>{user.email}</h3>) : null}
                     </div>
 
                     {hasRoles ? (
 
                         <div className="mt-8">
 
-                            {session.user.roles.map((thisRole) => (
+                            {user.roles.map((thisRole) => (
 
                                 <div className="badge badge-accent badge-lg font-mono text-white border-2 px-3 py-3 first-of-type:ml-0 ml-3">{thisRole}</div>
 
@@ -86,7 +93,7 @@ const Account = async (request, context) => {
                     
 
                     <div className='account-controls w-full'>
-                        <AccountControls serverSession={session} />
+                        <AccountControls user={user} />
                     </div>
 
                 </div>
@@ -95,7 +102,7 @@ const Account = async (request, context) => {
                     flex flex-col col-span-4 flex-grow`}>
 
                     <Suspense fallback={<div className="w-full h-full"></div>}>
-                        <EditProfileWrapper serverSession={session} updateUser={updateUser} />
+                        <EditProfileWrapper updateUser={updateUser} />
                     </Suspense>
 
                 </div>

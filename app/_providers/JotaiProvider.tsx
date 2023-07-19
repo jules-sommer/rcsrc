@@ -1,10 +1,10 @@
 'use client'
 
-import { Provider, createStore, useAtomValue } from "jotai"
+import { Provider, createStore, useAtom, useAtomValue, useSetAtom } from "jotai"
 import { z } from 'zod';
 import { v4 as uuid } from 'uuid';
 import { atom } from "jotai";
-import { loadable } from "jotai/utils";
+import { atomWithStorage, loadable } from "jotai/utils";
 import { signOut } from "next-auth/react";
 import { focusAtom } from "jotai-optics";
 import { useRef } from "react";
@@ -75,6 +75,7 @@ export type ISODateString = string;
 export const zSession = z.object({
 	user: zUser,
 	expires: z.string(),
+	authenticated: z.boolean(),
 });
 
 export type UserSession = z.infer<typeof zSession>;
@@ -87,6 +88,7 @@ export const sessionInitialState = {
 		email: "",
 		name: "",
 	},
+	authenticated: false,
 	expires: undefined
 };
 
@@ -105,30 +107,53 @@ export interface SessionApiResponse {
 
 }
 
-export const asyncFetchSession = atom(
-	async (get) => {
+export const fetchedSessionAtom = atom<UserSession>({
+	user: null,
+	authenticated: false,
+})
 
-		const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/session`, {
+export const asyncFetchSession = atom(
+	null,
+	async (get, set) => {
+
+		const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}session`, {
 			next: { revalidate: 60 },
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-		})
+		}).then(async (response) => {
+			
+			const result = await response.json();
+			
+			console.log(result);
+			
+			if(response) {
+				set(hasFetchedAtom, true)
+				set(fetchedSessionAtom, result)
+				return response
+			}
 
-		return await raw.json();
-		
+		}).catch((error) => {
+
+			return error;
+
+		});
 	}
 );
 
-export const asyncSessionAtom = loadable(asyncFetchSession)
+export const hasFetchedAtom = atomWithStorage('hasFetched', false);
 
 export const SessionInitialize = ({ session } : { session: UserSession }) => {
 
     const initialized = useRef(false);
+	const [, setSession] = useAtom(asyncFetchSession);
 
     if (!initialized.current) {
-        RCStore.set(sessionAtom, session);
+		setSession()
+		RCStore.set(sessionAtom, {
+			...session,
+		});
         initialized.current = true;
     }
 
@@ -136,26 +161,20 @@ export const SessionInitialize = ({ session } : { session: UserSession }) => {
 
 }
 
-export const useUserData = () => {
+export const useUser = () => {
 
-    const hasInitialized = useRef(false);
-    const { state, data } = useAtomValue(asyncSessionAtom);
+	const { user } = useAtomValue(sessionAtom);
 
-    if (state !== "hasData" || !data.session) {
-        hasInitialized.current = true;
-        return {
-            authenticated: false,
-            user: null,
-        }
-    }
-
-    const { authenticated, session: { user } } = data;
-    hasInitialized.current = true;
-
-    return {
-        authenticated,
-        user
-    }
+	if( user )
+		return {
+			authenticated: true,
+			user,
+		}
+	else
+		return {
+			authenticated: false,
+			user,
+		}
 
 }
 
@@ -168,7 +187,7 @@ export const isAuthenticatedAtom = atom(
         const session = get(sessionStorageAtom);
 
         if( session )
-            return session.user._id ? true : false;
+            return session.authenticated;
 		
         return false;
 
@@ -186,7 +205,7 @@ export const sessionAtom = atom(
 const signOutWithAtoms = ({ redirect = false, callbackUrl = '/' } : { redirect: boolean, callbackUrl: string }) => {
 
 	RCStore.set(sessionAtom, sessionInitialState)
-	signOut({ redirect: false, callbackUrl: '/' })
+	signOut({ redirect: redirect, callbackUrl: callbackUrl })
 
 	return true;
 
@@ -198,20 +217,67 @@ export const signOutAtom = atom(null,
 	}
 )
 
+export const prefetchUserProfileAtom = atom(
+	null,
+	async (get, set, email) => {
+
+		const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/read/email`, {
+            method: 'POST',
+            body: JSON.stringify({
+                email: email
+            }),
+            headers: {
+                'content-type': 'application/json',
+                'accept': 'application/json'
+            }
+        });
+
+		return await result.json();
+	
+	}
+
+);
+
 export const userEmailAtom = atom(
+
 	(get) => {
-		const { user: { email } } = get(sessionAtom);
+
+		const user = get(sessionAtom);
+		if( user == null )
+			return null;
+
+		const { user: { email } } = user;
 		return email;
+
 	},
+
 	(get, set, newEmail) => {
-		const { user } = get(sessionAtom);
-		set(sessionAtom, {
-			...get(sessionAtom),
-			user: {
-				...user,
-				email: newEmail
-			},
-		})
+
+		const session = get(sessionAtom);
+
+		if( session == null ) {
+			
+			set(sessionAtom, {
+				...sessionInitialState,
+				user: {
+					email: newEmail
+				}
+			})
+
+		} else {
+
+			const { user } = session;
+
+			set(sessionAtom, {
+				...get(sessionAtom),
+				user: {
+					...user,
+					email: newEmail
+				},
+			})
+		
+		}
+
 	}
 );
 
@@ -220,8 +286,13 @@ export const userEmailAtom = atom(
 */
 
 export const zCartItem = z.object({
-    _id: z.string().default(uuid()),
-    product: z.string(),
+    _id: z.string().uuid().default(uuid()),
+    product: z.object({
+		_id: zObjectId,
+		name: z.string(),
+		CAS: z.string().optional(),
+		smiles: z.string().optional(),
+	}),
     configuration: z.object({
         format: z.union([
             z.literal("powder"),
@@ -234,11 +305,18 @@ export const zCartItem = z.object({
                 z.literal("mg/mL"),
                 z.literal("ug/mL"),,
                 z.literal("mg/L")
-            ]).optional(),
+            ]).default("mg/mL").optional(),
         }).optional(),
         container: zObjectId.optional(),
-        quantity: z.number().min(1).max(10000).default(1),
     }),
+	quantity: z.object({
+		value: z.number().min(1).max(10000).default(1),
+		unit: z.union([
+			z.literal("mg"),
+			z.literal("g"),
+			z.literal("kg"),
+		]).default("mg").optional(),
+	}),
     createdAt: zUnixTime.optional(),
     updatedAt: zUnixTime.optional(),
 });
@@ -250,7 +328,9 @@ export const zCart = z.object({
     user: zObjectId,
     items: z.array(zCartItem),
     total: z.number().min(0).max(1000000).default(0),
+	confirmed: z.union([z.literal(true), z.literal(false)]).default(false),
     createdAt: zUnixTime.optional(),
+	paymentDue: zUnixTime.optional(),
     updatedAt: zUnixTime.optional(),
 });
 

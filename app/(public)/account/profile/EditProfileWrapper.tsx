@@ -7,7 +7,7 @@ import { z } from "zod";
 
 import { atom, useAtom, useAtomValue } from 'jotai';
 
-import { sessionAtom, useUserData } from "../../../_providers/JotaiProvider";
+import { sessionAtom, useUser } from "../../../_providers/JotaiProvider";
 
 import { EditProfileDetails } from "./_components/EditProfileDetails";
 import { EditAddresses } from "./_components/EditAddresses";
@@ -29,7 +29,7 @@ export const updateUserAtom = atom(null)
 
 export const EditProfileWrapper = ({ updateUser } : { updateUser: Function }) => {
 
-    const { authenticated, user } = useUserData();
+    const { authenticated, user } = useUser();
     const [session, setSession] = useAtom(sessionAtom);
 
     const [tabs, ] = useAtom(tabsAtom); 

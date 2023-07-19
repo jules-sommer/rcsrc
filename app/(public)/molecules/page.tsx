@@ -2,70 +2,72 @@ import { has } from "lodash";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { Suspense } from "react";
-import { SmileDrawerContainer } from "../../_utils/SmilesDrawerContainer";
+import { SmilesDrawerContainer } from "../../_utils/SmilesDrawerContainer";
 import { getProducts, getScaffoldByID, getScaffolds } from "../../_utils/api";
 import { slugify } from "../../_utils/utils";
 import { MoleculeBadge } from "./MoleculeBadge";
 import { Selector } from "./MoleculeScaffoldSort";
 import { MoleculeListSkeleton } from './loading';
 
-const MolListItem = async ({ key, name, smiles, CAS, description, tags = [], scaffoldID, inStock = true }) => {
+const MolListItem = async ({ key, isFeatured, name, smiles, CAS, iupac,  description, tags = [], scaffoldID, scaffold: serverScaffold, inStock }) => {
 
-    let { success, scaffold } = await getScaffoldByID(scaffoldID);
-
-    if (success)
-        scaffold = scaffold[0];
+    let { success, scaffold } = await getScaffoldByID({ id: scaffoldID });
 
 	return (
 
         <Link
             id={key}
-            custom_key={key}
             href={`/molecules/${slugify(name)}`}
-            aria-disabled={!inStock.value >= 0}
-            disabled={!inStock.value >= 0}
+            aria-disabled={inStock}
+            disabled={inStock}
             >
-            
-            <div className={`h-64 w-[100%] flex flex-row transition-all hover:origin-center ${inStock ? 'cursor-pointer hover:scale-[1.025]' : 'opacity-75 cursor-default' } bg-gradient-to-t from-indigo-200 via-blue-200 to-sky-200 rounded-2xl`}>
-                <div className='w-64 h-64 flex-shrink-0 rounded-2xl bg-transparent'>
-                    <SmilesDrawerContainer
-                        smiles={smiles}
-                        height={"100%"}
-                        width={"100%"}
-                        theme="github"
-                        className={`w-full h-full p-4 pl-6`}
-                    />
-                </div>
-                <div className='information p-4 grid grid-cols-4 grid-rows-4 grid-flow-row-dense flex-col'>
 
-                    <div className="flex flex-col col-start-1 col-span-3 row-start-1 row-span-1">
+            <div className={`indicator h-64 w-[100%] flex flex-row transition-all ease-in-out hover:origin-center ${inStock ? 'cursor-pointer hover:scale-[1.025] hover:translate-y-[-5px]' : 'opacity-75 cursor-default' } bg-gradient-to-tr from-indigo-200 via-blue-200 to-sky-200 rounded-2xl`}>
 
-                        <h3 className='name whitespace-nowrap text-slate-900 font-mono text-md font-bold'>{name}</h3>
-                        <h4 className='font-mono text-sm mb-2'><b>CAS# </b>{CAS}</h4>
-                        <p>In Stock: {JSON.stringify(inStock)}</p>
-                    
+                {inStock ? ( <span className="indicator-item badge border-2 border-cyan-400/75 shadow-md badge-secondary -translate-x-2">In Stock!</span> ) : null}
+                {isFeatured ? ( <span className="indicator-item badge border-2 border-blue-200/75 badge-info shadow-md translate-x-[-85px]">Featured</span> ) : null}
+
+                <div className={`flex flex-row h-full w-full`}>
+                    <div className='w-64 h-64 flex-shrink-0 rounded-2xl bg-transparent'>
+                        <SmilesDrawerContainer
+                            smiles={smiles}
+                            height={"100%"}
+                            width={"100%"}
+                            theme="github"
+                            className={`w-full h-full p-4 pl-6`}
+                        />
                     </div>
+                    <div className='information p-4 grid grid-cols-4 grid-rows-4 grid-flow-row-dense flex-col'>
+
+                        <div className="flex prose text-slate-900 flex-col col-start-1 col-span-3 row-start-1 row-span-1">
+
+                            <h3 className='name whitespace-nowrap mb-0 text-slate-900 font-mono text-md font-bold'>{name}</h3>
+                            <h4 className='font-mono text-slate-600 text-sm mb-2'><b>CAS# </b>{CAS}</h4>
+                        
+                        </div>
 
 
-                    <div className="flex flex-row h-min w-min col-start-1 col-span-3 row-start-2 row-span-1 items-start">
+                        <div className="flex flex-row h-min w-min col-start-1 col-span-3 row-start-2 row-span-1 items-start">
 
-                        <Suspense fallback={<div className="h-4 w-full bg-sky-600 animate-pulse" />}>
-                            <div className="inline-flex h-min w-auto mr-0 items-center rounded-s-md bg-purple-50 px-2 py-1 text-xs font-bold whitespace-nowrap text-purple-700 ring-2 ring-inset ring-blue-700/30">Category:<br/>Scaffold:</div>
-                            <div className="inline-flex h-min w-auto ml-0 items-center rounded-e-md bg-purple-50 px-2 py-1 text-xs font-medium whitespace-nowrap text-purple-700 ring-2 ring-inset ring-blue-700/30">{scaffold.name}<br />{scaffold.iupac}</div>
-                        </Suspense>
-                            
-                    </div>
+                            <Suspense fallback={<div className="h-4 w-full bg-sky-600 animate-pulse" />}>
+                                <div className="inline-flex h-min w-auto mr-0 items-center rounded-s-md bg-purple-50 px-2 py-1 text-xs font-bold whitespace-nowrap text-purple-700 ring-2 ring-inset ring-blue-700/30">Category:<br/>Scaffold:</div>
+                                <div className="inline-flex h-min w-auto ml-0 items-center rounded-e-md bg-purple-50 px-2 py-1 text-xs font-medium whitespace-nowrap text-purple-700 ring-2 ring-inset ring-blue-700/30">{scaffold.name}<br />{scaffold.iupac}</div>
+                            </Suspense>
+                                
+                        </div>
 
-                    <div className="flex flex-row w-full place-content-start items-start justify-start flex-wrap col-start-1 col-span-4 row-start-3 row-span-2">
+                        <div className="flex flex-row w-full place-content-start items-start justify-start flex-wrap col-start-1 col-span-4 row-start-3 row-span-2">
 
-                        {tags.map((thisTag, index) => (
-                            <MoleculeBadge
-                                key={index}
-                                size={'large'}
-                                className=""
-                            >{thisTag}</MoleculeBadge>
-                        ))}
-                    
+                            {tags.map((thisTag, index) => (
+                                <MoleculeBadge
+                                    key={index}
+                                    size={'small'}
+                                    className=""
+                                >{thisTag}</MoleculeBadge>
+                            ))}
+                        
+                        </div>
+
                     </div>
 
                 </div>
@@ -78,42 +80,15 @@ const MolListItem = async ({ key, name, smiles, CAS, description, tags = [], sca
 
 }
 
-const ListAllMolecules = async () => {
+const ListAllMolecules = async ({ searchParams }) => {
 
-    let url = headers().get('next-url');
-    let searchParams = null;
-
-    if (!url) {
-        console.warn(`no next-url header`);
-    } else {
-
-        searchParams = url.substring(url.indexOf("?") + 1)
-                            .split("&")
-                            .reduce((memo, param) => ({
-                                ...memo,
-                                [param.split("=")[0]]: param.split("=")[1]
-                            }), {});
-
-    }
-
-    console.log(`URL: ${url}`)
-    console.log(`Search Params: ${JSON.stringify(searchParams)}`)
-
-    let filter = null;
-
-    if (has(searchParams, 'scaffold'))
-        filter = { 'scaffold': searchParams.scaffold };
-    else
-        filter = {};
+    console.log(searchParams)
     
     const { success: hasProducts, products } = await getProducts();
     let { success: hasScaffolds, scaffolds } = await getScaffolds(true);
     
     console.log(products)
         
-    if(!hasProducts || !hasScaffolds)
-        console.log(error);
-    
    // const pchem_2d_struct = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${slugify(thisProduct.name).split('-')[0]}/PNG?record_type=2d&image_size=300x300`;
 
     return (
@@ -136,20 +111,23 @@ const ListAllMolecules = async () => {
 
                     {products.map((thisProduct) => {
 
-                        const scaffold = scaffolds.filter((thisScaffold) => thisScaffold._id === thisProduct.scaffold);
+                        const scaffold = scaffolds.filter((thisScaffold) => thisScaffold._id === thisProduct.scaffold)
+                        const isInStock = thisProduct.inStock.value !== 0 ? true : false;
                         
                         return (
                             
                             <MolListItem
                                 key={thisProduct._id}
                                 name={thisProduct.name}
+                                isFeatured={thisProduct.isFeatured}
                                 CAS={thisProduct.CAS}
+                                iupac={thisProduct.iupac}
                                 description={thisProduct.description}
                                 smiles={thisProduct.smiles}
                                 tags={thisProduct.tags}
-                                scaffoldID={has(thisProduct, 'scaffold') ? thisProduct.scaffold : false}
+                                scaffoldID={thisProduct.scaffold}
                                 scaffold={scaffold.length > 0 ? scaffold[0] : null}
-                                inStock={has(thisProduct, 'inStock') && thisProduct.inStock.value >= 0 ? true : false}
+                                inStock={isInStock}
                             />
                     
                         );

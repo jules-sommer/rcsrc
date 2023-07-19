@@ -1,5 +1,5 @@
 import { getProductByIsFeatured } from "../_utils/api";
-import FeaturedCard, { FeatureCardSkeleton } from "../_primitives/featureCard/featureCard";
+import FeaturedCard, { FeatureCardSkeleton } from "../_primitives/featureCard/FeaturedCard";
 import { Suspense } from "react";
 
 const Hero = ({ title, blurb, theme = 'default' }) => {

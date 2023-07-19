@@ -15,7 +15,6 @@ import { RadioGroup, Switch, Tab } from '@headlessui/react';
 import {
 	useState, useReducer, useContext, useMemo, useEffect,
 } from 'react';
-import { PRODUCT_LIST } from '../molecules.productList';
 import { CartDispatchContext, CartStateContext } from '../../../_providers/cartProvider';
 import PropTypes from 'prop-types';
 import Formatter from '../../../_utils/moneyFormatter';

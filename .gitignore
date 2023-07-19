@@ -65,3 +65,7 @@ aws-exports.js
 #amplify-do-not-edit-end
 .env.json
 _swc_error_jotai_nextjs.txt
+.env
+.env.development
+.env
+.env.development

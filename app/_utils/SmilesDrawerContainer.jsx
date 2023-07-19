@@ -3,7 +3,7 @@
 import React, { createRef, useEffect, useRef } from "react";
 import SmilesDrawer from "smiles-drawer";
 
-export const SmileDrawerContainer = ({ smiles, theme='github', height = '256px', width = '256px', className }) => {
+export const SmilesDrawerContainer = ({ smiles, theme='github', height = '256px', width = '256px', className }) => {
 
     const canvasRef = useRef();
 

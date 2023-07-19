@@ -97,17 +97,25 @@ export const getProductAttributes = async (orderingOptions: OrderingOptions, pro
 
 // END PRODUCT ATTRIBUTES
 
-export const getProductBySlug = async (molSlug: String) => {
+export const getProductBySlug = async (slug: String) => {
 
-    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/molSlug/${sanitize(molSlug)}`, { next: { revalidate: 60 } });
+    console.log(process.env.NEXT_PUBLIC_API_URL)
+    console.log(slug)
+
+    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/slug/${sanitize(slug)}`, { next: { revalidate: 60 * 60 } });
     
     if (!raw.ok) {
         // This will activate the closest `error.js` Error Boundary
         throw new Error(`Failed to fetch data: ${raw.status} ${raw.statusText}`)
     }
 
-    const result = await raw.json();
-    return result;
+    const { success, message, product } = await raw.json();
+
+    console.log(success)
+    console.log(product)
+    console.log(message)
+
+    return { success, product };
 
 }
 
@@ -162,10 +170,13 @@ export const getScaffolds = async ( shouldGetProducts = false ) => {
 // Get pharmacore / scaffold by ID, if no ID is passed it returns all scaffolds
 export const getScaffoldByID = async ({ id = '' } : { id: string }) => {
 
-    let cleanId = sanitize(id);
+    let cleanId = id;
 
-    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scaffold${id !== '' ? '/'+cleanId : null}`)
-    const { success, data: scaffold } = await raw.json();
+    const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scaffold/${id !== '' ? cleanId : null}`)
+    let { success, data: scaffold } = await raw.json();
+
+    if( success )
+        scaffold = scaffold[0];
 
     return { success, scaffold };
 

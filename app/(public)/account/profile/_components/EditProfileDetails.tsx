@@ -2,25 +2,25 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { useAtom } from "jotai";
-import { sessionAtom, useUserData } from "../../../../_providers/JotaiProvider";
+import { sessionAtom, useUser } from "../../../../_providers/JotaiProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isLoadingAtom } from "../EditProfileWrapper";
 
 export const EditProfileDetails = ({ tabTitle, display, updateUser } : { tabTitle: string, display: boolean, updateUser: Function }) => {
 
-    const { authenticated, user } = useUserData();
+    const { authenticated, user } = useUser();
     const [session, setSession] = useAtom(sessionAtom);
     const [isLoading, setIsLoading] = useAtom(isLoadingAtom);
 
     const EditProfileForm = z.object({
-        name:              z.coerce.string().min(1, { message: `At least tell us your name, c'mon!` }),
-        email:             z.coerce.string()
-                            .email({ message: `Are you sure that's an email, chief?` })
-                            .min(3, { message: `Email must be at least 3 characters, otherwise that's a damn cool email address... I'm jealous.` }),
-        company:           z.coerce.string(),
-        researchIntent:    z.coerce.string()
-                            .min(10, { message: `Letter of research intent must be at least 40 characters!` })
-                            .max(750, { message: `Letter of research intent must be less than 500 characters!` })
+        name:               z.coerce.string().min(1, { message: `At least tell us your name, c'mon!` }),
+        email:              z.coerce.string()
+                                .email({ message: `Are you sure that's an email, chief?` })
+                                .min(3, { message: `Email must be at least 3 characters, otherwise - that's a damn cool email address... I'm jealous.` }),
+        company:            z.coerce.string(),
+        researchIntent:     z.coerce.string()
+                                .min(10, { message: `Letter of research intent must be at least 40 characters!` })
+                                .max(750, { message: `Letter of research intent must be less than 500 characters!` })
     });
 
     type EditProfileSchema = z.infer<typeof EditProfileForm>;
@@ -29,6 +29,7 @@ export const EditProfileDetails = ({ tabTitle, display, updateUser } : { tabTitl
         register,
         handleSubmit,
         setError,
+        watch,
         reset,
         formState: {
             errors
@@ -52,15 +53,19 @@ export const EditProfileDetails = ({ tabTitle, display, updateUser } : { tabTitl
 
         // Create a new user object with the updated data from the form, and the existing data from the session object.
 
-        setSession({
+        console.log(data)
+
+        const newUserObj = {
             ...session,
             user: {
                 ...session.user,
                 ...data
             }
-        });
+        };
 
-        const res = await updateUser(session);
+        setSession(newUserObj);
+
+        const res = await updateUser(session.user.id, { ...data });
 
         console.log(res);
 

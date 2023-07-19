@@ -1,7 +1,9 @@
 import Image from 'next/image';
-import SmileDrawerContainer from '../../../_utils/SmilesDrawerContainer';
+import { SmilesDrawerContainer } from '../../../_utils/SmilesDrawerContainer';
 
 export const MoleculeInfo = ({ product }) => {
+
+    console.log(product)
 
     if (!product)
         console.debug(`[MoleculeInfo.jsx] product is null`);
@@ -11,8 +13,8 @@ export const MoleculeInfo = ({ product }) => {
         <div className="flex w-[100%] px-12 mx-auto">
 
             <div className="w-64 h-64 flex-shrink-0 rounded-2xl inline-flex mr-24 items-center bg-indigo-100 ring-1 ring-inset ring-indigo-600-700/30">
-                <SmileDrawerContainer
-                    SMILES={product.molSMILES}
+                <SmilesDrawerContainer
+                    smiles={product.smiles}
                     height={"100%"}
                     width={"100%"}
                     theme="github"
@@ -21,7 +23,7 @@ export const MoleculeInfo = ({ product }) => {
 
             <div className="text-sky-100 flex flex-col font-mono title w-9/12 mx-auto mb-8">
 
-                <h1 className="text-4xl">{product.molName}</h1>
+                <h1 className="text-4xl">{product.name}</h1>
 
                 <span className="my-5">
 
@@ -38,7 +40,7 @@ export const MoleculeInfo = ({ product }) => {
                     <h2 className="text-md text-sky-100/50">
                         <b className="text-sky-100/75">SMILES:</b>
                         {' '}
-                        {product.molSMILES}
+                        {product.smiles}
                     </h2>
 
                 </span>

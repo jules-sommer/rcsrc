@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "target": "es2017",
     "lib": [
       "dom",
       "dom.iterable",
@@ -23,12 +24,18 @@
       }
     ]
   },
+
+  "baseUrl": ".",
+  "paths": {
+    "@/*": ["./app/*"]
+  },
+  
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "app/_atoms/viewSession.jsx"  ],
   "exclude": [
     "node_modules"
   ]

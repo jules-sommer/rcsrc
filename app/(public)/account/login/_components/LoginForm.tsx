@@ -16,8 +16,8 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { SecondaryBodyText } from '../../../../_primitives/Typography';
 
-import { atom, useAtom } from "jotai";
-import { sessionAtom, userEmailAtom } from "../../../../_providers/JotaiProvider";
+import { atom, useAtom, useAtomValue } from "jotai";
+import { prefetchUserProfileAtom, sessionAtom, userEmailAtom } from "../../../../_providers/JotaiProvider";
 import { RCStore } from "../../../../_providers/JotaiProvider";
 
 import isEmail from 'validator/lib/isEmail';
@@ -39,7 +39,7 @@ export const LoginForm = ({ serverSession }) => {
     const [session, setSession] = useAtom(sessionAtom);
     const [isLoading, setIsLoading] = useAtom(isLoadingAtom);
     const [userEmail, setUserEmail] = useAtom(userEmailAtom);
-
+    const [, prefetchUser] = useAtom(prefetchUserProfileAtom);
 
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/account?login=success";
@@ -82,18 +82,17 @@ export const LoginForm = ({ serverSession }) => {
 
         setIsLoading(true);
 
-        const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/read/email`, {
-            method: 'POST',
-            body: JSON.stringify({
-                email: userEmail
-            }),
-            headers: {
-                'content-type': 'application/json',
-                'accept': 'application/json'
-            }
-        });
+        type LoginResponse = {
+            success: boolean,
+            message: string,
+            data: Object,
+        }
 
-        const { success, message, data: user } = await result.json();
+        const { success, message, data: user } = await prefetchUser(formData.email);
+
+        console.log( success );
+        console.log( message );
+        console.log( user );
 
         if( success && user ) {
 
@@ -102,7 +101,8 @@ export const LoginForm = ({ serverSession }) => {
                 user: {
                     ...session.user,
                     ...user
-                }
+                },
+                authenticated: false,
             });
 
             const res = await signIn('email', { 
