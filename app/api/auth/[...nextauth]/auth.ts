@@ -11,13 +11,14 @@ import GoogleProvider from "next-auth/providers/google";
 
 import chalk from 'chalk';
 
-import { User, ObjectIdType } from '../../../_atoms/sessionInitialState';
 import { updateUserById } from '../../../_utils/api';
 
 import type { MongoClient } from 'mongodb';
+import { ObjectIdType } from "../../../_providers/JotaiProvider";
 
 export const authOptions: NextAuthOptions = {
     
+    /* @ts-expect-error */
     adapter: MongoDBAdapter(
         clientPromise as Promise<MongoClient>, 
         { databaseName: 'next_auth' } as MongoDBAdapterOptions
@@ -109,7 +110,7 @@ sessions to the DB ).
             console.log(chalk.bgGreenBright(JSON.stringify(account)));
             console.log(chalk.bgWhiteBright(JSON.stringify(profile))); // undefined
 
-            return { user, account, profile };
+            return true;
 
         },
 
@@ -128,11 +129,19 @@ sessions to the DB ).
             };
 
         },
+
+        redirect: async ({ url, baseUrl }) => {
+            console.log(`redirect callback from ${baseUrl} to ${url}`);
+            return baseUrl
+        },
         
         session: async({ session, trigger, token, user, newSession }) => {
 
+            // @ts-expect-error
             if( session.user.id ) {
+                //@ts-expect-error
                 session.user._id = session.user.id as ObjectIdType;
+                // @ts-expect-error
                 delete session.user.id;
             }
 
@@ -143,7 +152,8 @@ sessions to the DB ).
 
                 try {
 
-                    const result = await updateUserById({ _id: session.user.id as string, user: newSession as User });
+                    // @ts-expect-error
+                    const result = await updateUserById({ _id: session.user.id as ObjectIdType, user: newSession as User });
 
                     if( result.success == true ) {
 
@@ -189,45 +199,52 @@ sessions to the DB ).
 
     events: {
 
-        signIn: async(message) => {
+        signIn: async({ user, account, profile, isNewUser }) => {
 
             console.log(`Sign in event`);
-            console.log(message);
+            console.log(user);
+            console.log(account);
+            console.log(profile);
+            console.log(`isNewUser: ${JSON.stringify(isNewUser)}`);
 
         },
 
-        signOut: async(message) => {
+        signOut: async({ session, token }) => {
 
             console.log(`Sign out event`);
-            console.log(message);
+            console.log(session);
+            console.log(token);
 
         },
 
-        createUser: async(message) => {
+        createUser: async({ user }) => {
             
             console.log(`Create user event`);
-            console.log(message);
+            console.log(user);
 
         },
 
-        updateUser: async(message) => {
+        updateUser: async({ user }) => {
 
             console.log(`Update user event`);
-            console.log(message);
+            console.log(user);
 
         },
 
-        linkAccount: async(message) => {
+        linkAccount: async({ user, account, profile }) => {
             
             console.log(`Link account event`);
-            console.log(message);
+            console.log(user);
+            console.log(profile);
+            console.log(account);
 
         },
 
-        session: async(message) => {
+        session: async({ session, token }) => {
 
             console.log(`Session event`);
-            console.log(message);
+            console.log(session);
+            console.log(token);
 
         },
 

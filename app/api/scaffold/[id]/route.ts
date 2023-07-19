@@ -2,14 +2,14 @@
 
 import { stdout } from "process";
 import { getMongoClient } from "../../../_utils/db";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise from "../../../_lib/db";
 
-export const GET = async (request, context) => {
+export const GET = async (request: NextRequest, context) => {
 
     // fetch ID from context params /api/scaffold/[id]
-    let id = context.params.id;
+    let { id } = context.params;
 
     try {
 
