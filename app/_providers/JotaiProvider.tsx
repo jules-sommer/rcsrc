@@ -8,6 +8,7 @@ import { atomWithStorage, loadable } from "jotai/utils";
 import { signOut } from "next-auth/react";
 import { focusAtom } from "jotai-optics";
 import { useRef } from "react";
+import { useStyleRegistry } from "styled-jsx";
 
 /*
 *   CREATE JOTAI STORE
@@ -116,8 +117,7 @@ export const asyncFetchSession = atom(
 	null,
 	async (get, set) => {
 
-		const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}session`, {
-			next: { revalidate: 60 },
+		const raw = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/session`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
@@ -161,6 +161,16 @@ export const SessionInitialize = ({ session } : { session: UserSession }) => {
 
 }
 
+export const sessionStorageAtom = atom(JSON.parse(localStorage.getItem('session')) ?? sessionInitialState);
+
+export const sessionAtom = atom( 
+	(get) => get(sessionStorageAtom), 
+	(get, set, newSession) => { 
+		set(sessionStorageAtom, newSession) 
+		localStorage.setItem('session', JSON.stringify(newSession)) 
+	}
+)
+
 export const useUser = () => {
 
 	const { user } = useAtomValue(sessionAtom);
@@ -169,17 +179,15 @@ export const useUser = () => {
 		return {
 			authenticated: true,
 			user,
-		}
+		} as UserSession;
 	else
 		return {
 			authenticated: false,
 			user,
-		}
+		} as UserSession;
 
 }
 
-
-export const sessionStorageAtom = atom(JSON.parse(localStorage.getItem('session')) ?? sessionInitialState);
 
 export const isAuthenticatedAtom = atom(
 	(get) => {
@@ -191,14 +199,6 @@ export const isAuthenticatedAtom = atom(
 		
         return false;
 
-	}
-)
-
-export const sessionAtom = atom( 
-	(get) => get(sessionStorageAtom), 
-	(get, set, newSession) => { 
-		set(sessionStorageAtom, newSession) 
-		localStorage.setItem('session', JSON.stringify(newSession)) 
 	}
 )
 

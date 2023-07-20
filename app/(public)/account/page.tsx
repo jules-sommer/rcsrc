@@ -15,8 +15,6 @@ import { revalidatePath } from 'next/cache'
 import { EditProfileWrapper } from './profile/EditProfileWrapper'
 import { ObjectIdType, UserSession } from '../../_providers/JotaiProvider';
 
-import { PrismaClient } from '@prisma/client'
-
 const updateUser = async (id: ObjectIdType, user: UserSession) => {
     'use server'
 
@@ -34,7 +32,7 @@ const updateUser = async (id: ObjectIdType, user: UserSession) => {
 
     revalidatePath('/account');
 
-    return { 
+    return {
         success,
         message,
         result
@@ -44,7 +42,6 @@ const updateUser = async (id: ObjectIdType, user: UserSession) => {
 
 const Account = async (request, context) => {
 
-    const prisma = new PrismaClient()
     const { user } = await getServerSession(authOptions) as UserSession;
 
     if (user) {
@@ -53,7 +50,7 @@ const Account = async (request, context) => {
         let hasRoles = user.roles ? true : false;
         let hasCompany = user.company ? true : false;
         let hasEmail = user.email ? true : false;
-        
+
         return (
 
             <div className='w-9/12 mx-auto py-12 grid gap-8 grid-cols-6 auto-rows-min'>
@@ -88,9 +85,9 @@ const Account = async (request, context) => {
                             ))}
 
                         </div>
-                        
+
                     ) : null}
-                    
+
 
                     <div className='account-controls w-full'>
                         <AccountControls user={user} />

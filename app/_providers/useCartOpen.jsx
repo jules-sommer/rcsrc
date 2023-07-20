@@ -1,30 +1,28 @@
 'use client'
 
-import { useState, useMemo, useRef } from "react";
 import { isClientAtom } from "./isClientProvider";
-import { usePathname, useRouter } from "next/navigation";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useAtom } from "jotai";
+
+const cartDrawerAtom = atom(false);
+
+const toggle = () => {
+
+    const [isOpen, setIsOpen] = useAtom(cartDrawerAtom);
+
+    isOpen ? setIsOpen(false) : setIsOpen(true);
+
+    return isOpen;
+
+}
 
 export const useCartOpen = () => {
 
     const isClient = useAtomValue(isClientAtom);
-    const router = useRouter();
-    const pathname = usePathname();
+    const isOpen = useAtomValue(cartDrawerAtom);
 
-    const referrer = useRef(pathname);
-    const [isOpen, setIsOpen] = useState(false);
-
-    useMemo(() => {
-
-        referrer.current = pathname;
-
-        if (pathname === '/cart')
-            setIsOpen(true);
-        else
-            setIsOpen(false)
-
-    }, [pathname])
-
-    return isOpen;
+    return {
+        toggle,
+        isOpen,
+    };
 
 };

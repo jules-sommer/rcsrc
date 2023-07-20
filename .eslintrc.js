@@ -3,7 +3,7 @@ module.exports = {
 	dependencies: ['eslint-config-airbnb'],
 	rules: {
 		'linebreak-style': [0, 'windows'],
-		indent: [2, 'tab'],
+		'indent': [2, 'tab'],
 		'no-tabs': [1, { allowIndentationTabs: true }],
 		'react/jsx-indent': [1, 'tab'],
 		'react/jsx-indent-props': [1, 'tab'],

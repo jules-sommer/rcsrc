@@ -1,11 +1,15 @@
 {
+  "compileOnSave": true,
   "compilerOptions": {
-    "target": "es2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "esnext",
+    "module": "esnext",
+    "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -13,10 +17,44 @@
     "noEmit": true,
     "incremental": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "importHelpers": true,
+    "lib": [
+      "es2020",
+      "dom"
+    ],
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ui/*": [
+        "app/_primitives/*"
+      ],
+      "@lib/*": [
+        "app/_lib/*"
+      ],
+      "@atoms/*": [
+        "app/_atoms/*"
+      ],
+      "@providers/*": [
+        "app/_providers/*"
+      ],
+      "@utils/*": [
+        "app/_utils/*"
+      ],
+      "@api/*": [
+        "app/api/*"
+      ],
+      "@pub/*": [
+        "app/(public)/"
+      ],
+      "@rcsrc/auth": [
+        "app/api/auth/[...nextauth]/auth.ts"
+      ],
+      "@apiConsumer": [
+        "app/_utils/api.ts"
+      ]
+    },
     "jsx": "preserve",
     "plugins": [
       {
@@ -24,19 +62,16 @@
       }
     ]
   },
-
-  "baseUrl": ".",
-  "paths": {
-    "@/*": ["./app/*"]
-  },
-  
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ],
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "app/_atoms/viewSession.jsx"  ],
-  "exclude": [
-    "node_modules"
+    "**/*.tsx",
+    "app/_atoms/viewSession.jsx",
+    "../../apps/rcsrc-mono/.next/types/**/*.ts"
   ]
 }

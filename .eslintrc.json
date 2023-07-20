@@ -1,0 +1,40 @@
+{
+  "extends": [
+    "plugin:@nx/react-typescript",
+    "next",
+    "next/core-web-vitals",
+    "../../.eslintrc.json"
+  ],
+  "ignorePatterns": ["!**/*", ".next/**/*"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "rules": {
+        "@next/next/no-html-link-for-pages": ["error", "apps/rcsrc-mono/pages"]
+      }
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {}
+    },
+    {
+      "files": ["*.js", "*.jsx"],
+      "rules": {}
+    }
+  ],
+  "rules": {
+    "@next/next/no-html-link-for-pages": "off",
+    "linebreak-style": [0, "windows"],
+		"indent": [2, "tab"],
+		"no-tabs": [1, { "allowIndentationTabs": true }],
+		"react/jsx-indent": [1, "tab"],
+		"react/jsx-indent-props": [1, "tab"],
+		"padded-blocks": [2, "always", { "allowSingleLineBlocks": true }],
+		"react/function-component-definition": [1, { "namedComponents": "arrow-function" }],
+		"curly": ["error", "multi-or-nest"],
+		"react/prop-types": [1, { "ignore": ["children", "className"] }],
+  },
+  "env": {
+    "jest": true
+  }
+}

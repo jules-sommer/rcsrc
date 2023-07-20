@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { SmilesDrawerContainer } from '../../../_utils/SmilesDrawerContainer';
+import { SmilesDrawerWrapper } from '@ui/smilesDrawer/SmilesDrawerWrapper';
 
 export const MoleculeInfo = ({ product }) => {
 
@@ -13,7 +13,7 @@ export const MoleculeInfo = ({ product }) => {
         <div className="flex w-[100%] px-12 mx-auto">
 
             <div className="w-64 h-64 flex-shrink-0 rounded-2xl inline-flex mr-24 items-center bg-indigo-100 ring-1 ring-inset ring-indigo-600-700/30">
-                <SmilesDrawerContainer
+                <SmilesDrawerWrapper
                     smiles={product.smiles}
                     height={"100%"}
                     width={"100%"}
@@ -60,11 +60,11 @@ export const MoleculeInfo = ({ product }) => {
                 </div>
 
             </div>
-                    
+
         </div>
 
     );
-        
+
 }
 
 export default MoleculeInfo;

@@ -12,6 +12,7 @@ const NextConfig = {
 
 	reactStrictMode: false,
 	output: 'standalone',
+	basePath: '/',
 
 	typescript: {
 		// !! WARN !!
@@ -19,7 +20,44 @@ const NextConfig = {
 		// your project has type errors.
 		// !! WARN !!
 		ignoreBuildErrors: true,
+
 	},
+
+	swcMinify: true,
+
+	modularizeImports: {
+		lodash: {
+			transform: 'lodash/{{member}}',
+			preventFullImport: true,
+		},
+	},
+
+	compiler: {
+		styledComponents: {
+			// Enabled by default in development, disabled in production to reduce file size,
+			// setting this will override the default for all environments.
+			displayName: true,
+			// Enabled by default.
+			ssr: true,
+			// Enabled by default.
+			fileName: true,
+			// Empty by default.
+			topLevelImportPaths: [],
+			// Defaults to ["index"].
+			meaninglessFileNames: ["index"],
+			// Enabled by default.
+			cssProp: true,
+			// Empty by default.
+			namespace: "",
+			// Not supported yet.
+			minify: true,
+			// Not supported yet.
+			transpileTemplateLiterals: true,
+			// Not supported yet.
+			pure: true,
+		},
+	},
+
 	cron: [
 		{
 			"path": '/api/cron',
@@ -36,6 +74,7 @@ const NextConfig = {
 		appDir: true,
 		serverActions: true,
 		webVitalsAttribution: ['CLS', 'LCP'],
+		swcTraceProfiling: true,
 
 	},
 	
@@ -45,12 +84,6 @@ const NextConfig = {
 		// your project has ESLint errors.
 		ignoreDuringBuilds: true,
 
-	},
-
-	compiler: {
-
-		
-		
 	},
 
 	images: {

@@ -1,8 +1,8 @@
 
 
 import React from 'react';
-import Header from '../../_primitives/header/header'
-import Footer from '../../_primitives/footer/footer'
+import Header from '@ui/header/Header'
+import Footer from "@ui/footer/Footer"
 import { LoadingBarWrapper } from '../../_primitives/LoadingBar';
 
 export const MoleculeListSkeleton = ({ numGridItems = 4 }) => {
@@ -35,7 +35,7 @@ export const MoleculeListSkeleton = ({ numGridItems = 4 }) => {
             </div>
 
         </main>
-            
+
     )
 
 
@@ -48,13 +48,13 @@ const LoadingPage = ({ children }) => {
         <main className='w-full h-full bg-indigo-950'>
 
             <LoadingBarWrapper />
-        
+
             {children}
 
         </main>
-        
+
     )
-    
+
 
 }
 

@@ -23,7 +23,9 @@ export const SessionInitializeWrapper = async () => {
     }
 
     return (
+
         <SessionInitialize session={serverSession} />
+    
     )
 
 }

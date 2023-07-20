@@ -2,14 +2,43 @@ import { has } from "lodash";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { Suspense } from "react";
-import { SmilesDrawerContainer } from "../../_utils/SmilesDrawerContainer";
+import { SmilesDrawerWrapper } from "@ui/smilesDrawer/SmilesDrawerWrapper";
 import { getProducts, getScaffoldByID, getScaffolds } from "../../_utils/api";
 import { slugify } from "../../_utils/utils";
 import { MoleculeBadge } from "./MoleculeBadge";
 import { Selector } from "./MoleculeScaffoldSort";
 import { MoleculeListSkeleton } from './loading';
+import { ObjectIdType } from "@providers/JotaiProvider";
 
-const MolListItem = async ({ key, isFeatured, name, smiles, CAS, iupac,  description, tags = [], scaffoldID, scaffold: serverScaffold, inStock }) => {
+const MolListItem = async ({ 
+
+    key,
+    isFeatured,
+    name,
+    smiles,
+    CAS,
+    iupac,
+    description,
+    tags = [],
+    scaffoldID,
+    scaffold: serverScaffold,
+    inStock
+
+} : {
+
+    key: string,
+    isFeatured: boolean,
+    name: string,
+    smiles: string,
+    CAS: string,
+    iupac: string,
+    description: string,
+    tags: string[],
+    scaffoldID: ObjectIdType,
+    scaffold: any,
+    inStock: boolean
+
+}) => {
 
     let { success, scaffold } = await getScaffoldByID({ id: scaffoldID });
 
@@ -19,8 +48,7 @@ const MolListItem = async ({ key, isFeatured, name, smiles, CAS, iupac,  descrip
             id={key}
             href={`/molecules/${slugify(name)}`}
             aria-disabled={inStock}
-            disabled={inStock}
-            >
+        >
 
             <div className={`indicator h-64 w-[100%] flex flex-row transition-all ease-in-out hover:origin-center ${inStock ? 'cursor-pointer hover:scale-[1.025] hover:translate-y-[-5px]' : 'opacity-75 cursor-default' } bg-gradient-to-tr from-indigo-200 via-blue-200 to-sky-200 rounded-2xl`}>
 
@@ -29,7 +57,7 @@ const MolListItem = async ({ key, isFeatured, name, smiles, CAS, iupac,  descrip
 
                 <div className={`flex flex-row h-full w-full`}>
                     <div className='w-64 h-64 flex-shrink-0 rounded-2xl bg-transparent'>
-                        <SmilesDrawerContainer
+                        <SmilesDrawerWrapper
                             smiles={smiles}
                             height={"100%"}
                             width={"100%"}

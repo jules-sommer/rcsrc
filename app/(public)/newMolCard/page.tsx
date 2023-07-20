@@ -1,6 +1,6 @@
 import { getProducts, getScaffolds } from "../../_utils/api";
 import type { Molecule, Orientation } from "./molecule.types";
-import { SmilesDrawerContainer } from "../../_utils/SmilesDrawerContainer";
+import { SmilesDrawerContainer } from "../../_primitives/smilesDrawer/SmilesDrawerWrapper";
 import { MoleculeCard } from "./MoleculeCard";
 
 const molCardTestingPage = async () => {

@@ -1,23 +1,27 @@
 import clientPromise from '../../../../_lib/db'
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { toSafeInteger } from "lodash";
+import { NextApiResponse, NextApiRequest } from 'next/types';
 
-export const GET = async (request, context) => {
+export const GET = async (request: NextRequest, context) => {
 
-    const client = await clientPromise; 
+    const client = await clientPromise;
     const products = client.db('data').collection('products');
 
     try {
 
         const isFeatured = context.params.bool === 'true' ? true : false;
+
+        console.log(isFeatured)
+
         const filter = {
             'isFeatured': isFeatured
         };
 
-        const limit = request.nextUrl.searchParams.get('limit') 
+        const limit = request.nextUrl.searchParams.get('limit')
                         ? toSafeInteger(request.nextUrl.searchParams.get('limit')[0])
                         : 0;
-    
+
         const query = products.find(filter, { limit: limit });
 
         const res = await query.toArray();
@@ -26,7 +30,7 @@ export const GET = async (request, context) => {
             success: true,
             message: `/api/products/isFeatured/${isFeatured} found ${res.length} products`,
             data: res,
-        }, { status: 200 });    
+        }, { status: 200 });
 
     } catch(err) {
 
@@ -40,4 +44,4 @@ export const GET = async (request, context) => {
 
     }
 
-} 
+}

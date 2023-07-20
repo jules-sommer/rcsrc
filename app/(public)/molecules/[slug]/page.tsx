@@ -1,7 +1,5 @@
-import Image from 'next/image';
 import { Suspense } from 'react';
 import { titleize, slugify } from '../../../_utils/utils';
-import { useSWR } from 'swr';
 import MoleculeInfo from './MoleculeInfo';
 import MoleculeInfoSkeleton from './MoleculeInfoSkeleton';
 import { getProductByName } from '../../../_utils/dbUtils';
@@ -14,8 +12,9 @@ const MoleculePage = async ({ params }) => {
 
 	const { success, product } = await getProductBySlug(slugify(params.slug));
 
-	if (product) {
+  console.log(product)
 
+	if (product) {
 
 		return (
 
@@ -44,13 +43,12 @@ const MoleculePage = async ({ params }) => {
 	} else {
 
 		return (
-		
+
 			<h1>Error: Couldn't find product.</h1>
 
 		)
 
 	}
-
 
 };
 

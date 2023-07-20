@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { focusAtom } from "jotai-optics";
 
-import { CartItem } from "../_providers/JotaiProvider";
+import { CartItem } from "@providers/JotaiProvider";
 
 export const cartItemAtom = atom<CartItem>({
     _id: "",

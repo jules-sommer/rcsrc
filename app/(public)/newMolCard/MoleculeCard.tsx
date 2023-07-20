@@ -1,4 +1,4 @@
-import { SmilesDrawerContainer } from "../../_utils/SmilesDrawerContainer";
+import { SmilesDrawerContainer } from "../../_primitives/smilesDrawer/SmilesDrawerWrapper";
 import { MoleculeBadge } from "./MoleculeBadge";
 import { Molecule, Orientation } from "./molecule.types";
 
