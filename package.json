@@ -7,7 +7,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@aws-amplify/storage": "^5.6.3",
+    "@aws-amplify/storage": "^5.9.6",
     "@aws-amplify/ui": "^5.6.5",
     "@aws-amplify/ui-react": "^4.6.4",
     "@emotion/core": "^11.0.0",
@@ -19,7 +19,7 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.4",
     "@types/react": "^18.2.12",
-    "aws-amplify": "^5.3.3",
+    "aws-amplify": "^5.3.12",
     "copy-webpack-plugin": "^11.0.0",
     "lodash": "^4.17.21",
     "logrocket": "^4.0.3",
